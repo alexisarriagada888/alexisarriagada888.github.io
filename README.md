@@ -3,5 +3,6 @@
 
 Contiene:
   - Codigo APP y Pagina Web + Links para revisar resultado final
+      - index.html es la pagina principal
   - Infografía
   - Video
