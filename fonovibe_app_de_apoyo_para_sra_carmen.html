@@ -1,0 +1,2560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#059669">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FonoVibe Carmen">
+    <title>FonoVibe - App de Apoyo para Sra. Carmen</title>
+    <!-- Tailwind CSS cargado desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos clínicos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        button { cursor: pointer; }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid #059669;
+            outline-offset: 2px;
+        }
+        .template-view { display: none; }
+        .template-view.active { display: block; }
+        .med-fade-out {
+            opacity: 0 !important;
+            transform: scale(0.95) translateY(-8px) !important;
+            max-height: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            border-width: 0 !important;
+            overflow: hidden !important;
+            transition: all 0.7s ease-in-out !important;
+        }
+        .fonovibe-brand-pill {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 55%, #fefce8 100%);
+            border: 1.5px solid #6ee7b7;
+            box-shadow: 0 2px 10px -2px rgba(5, 150, 105, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+        .fonovibe-wordmark {
+            background: linear-gradient(90deg, #047857 0%, #0d9488 65%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.025em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+    <!-- Header con minimización al bajar y centrado consistente -->
+    <header id="mainHeader" class="bg-white/95 backdrop-blur-md border-b-2 border-emerald-600 sticky top-0 z-40 shadow-sm w-full overflow-x-clip transition-all duration-300">
+        <div id="headerInner" class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-3 transition-all duration-300">
+            <div id="headerTopRow" class="grid grid-cols-1 lg:grid-cols-3 items-center gap-3 sm:gap-4 transition-all duration-300">
+                <div class="flex items-center gap-3 min-w-0 justify-between lg:justify-start">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div id="brandIconBox" class="bg-blue-600 p-2.5 rounded-2xl text-white shadow shrink-0 transition-all duration-300">
+                            <i id="brandIcon" class="fa-solid fa-pills text-xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h1 id="brandTitle" class="font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight transition-all duration-300 truncate">Remedios</h1>
+                            <p id="brandSubtitle" class="text-sm sm:text-base text-slate-700 font-bold mt-0.5 transition-all duration-300 flex items-center gap-1.5 truncate">
+                                <span id="timeWeatherEmojis">🌅 🌤️</span>
+                                <span id="greetingText">Buenos días, Sra. Carmen</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marca FonoVibe Centrada -->
+                <div id="fonovibeCenterSlot" class="flex items-center justify-center transition-all duration-300">
+                    <div id="fonovibeCenterBadge" class="fonovibe-brand-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full select-none shrink-0 opacity-100 scale-100 transition-all duration-300">
+                        <svg class="w-5 h-5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 20.5s-7-4.35-7-9.8A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7 3.4c0 5.45-7 9.8-7 9.8Z"/>
+                            <path d="M8.5 11.5h2l1.2-2.2 1.6 4.4 1.2-2.2h1"/>
+                        </svg>
+                        <span class="fonovibe-wordmark font-extrabold text-base sm:text-lg">FonoVibe</span>
+                    </div>
+                </div>
+
+                <!-- Derecha: Mini Reloj + Selector de Rol -->
+                <div class="flex flex-wrap items-center justify-center lg:justify-end gap-2 sm:gap-3 min-w-0">
+                    <div id="headerMiniClock" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-950 font-extrabold text-xs sm:text-sm tabular-nums shrink-0">
+                        <i class="fa-regular fa-clock text-blue-600"></i>
+                        <span id="headerClockText">--:--:--</span>
+                    </div>
+
+                    <div class="inline-flex rounded-2xl bg-slate-100 p-1 border border-slate-200 shrink-0 max-w-full" role="group" aria-label="Cambiar perfil">
+                        <button type="button" id="btnRoleUsuaria" onclick="setUserRole('usuaria')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-600 text-white shadow transition flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-user"></i><span>Sra. Carmen</span>
+                        </button>
+                        <button type="button" id="btnRoleHija" onclick="setUserRole('hija')" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-people-roof"></i><span>Registro Hija</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Navegación Principal (Remedios / Compras) -->
+            <nav id="mainNavTabs" class="grid grid-cols-2 gap-2.5 sm:gap-3 pt-2 border-t border-slate-200/80 w-full transition-all duration-300">
+                <button type="button" onclick="selectSimpleTab('medicamento')" id="nav-medicamento" class="py-3.5 px-2 rounded-2xl font-extrabold text-base sm:text-lg bg-blue-600 text-white shadow flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all duration-300">
+                    <i class="fa-solid fa-pills text-xl text-white nav-icon transition-all"></i><span>Remedios</span>
+                </button>
+                <button type="button" onclick="selectSimpleTab('supermercado')" id="nav-supermercado" class="py-3.5 px-2 rounded-2xl font-bold text-base sm:text-lg bg-white text-slate-800 hover:bg-emerald-50 border-2 border-slate-200 flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all duration-300">
+                    <i class="fa-solid fa-cart-shopping text-xl text-emerald-700 nav-icon transition-all"></i><span>Compras</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main id="appViewport" class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- ========================================== -->
+        <!-- VISTA 1: REMEDIOS -->
+        <!-- ========================================== -->
+        <div id="view-medicamento" class="template-view active space-y-6">
+            <section id="nextBox" class="rounded-3xl p-5 border-2 border-blue-400 bg-blue-50 shadow-sm text-center">
+                <p class="text-base font-extrabold uppercase tracking-wider text-blue-900">Próximo remedio de Sra. Carmen</p>
+                <p id="nextText" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5"></p>
+                <p id="clockLine" class="text-lg sm:text-xl text-blue-900 font-extrabold mt-2 tabular-nums"></p>
+            </section>
+
+            <!-- Lista de Remedios -->
+            <ul id="medList" class="space-y-4"></ul>
+
+            <!-- Agregar Remedio por Voz o Texto -->
+            <section class="bg-white rounded-3xl border-2 border-slate-200 p-5 shadow-sm space-y-4">
+                <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-blue-600"></i> Agregar remedio
+                </h3>
+
+                <!-- Selector Manual: Para Hoy o Para Mañana -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" id="btnDayHoy" onclick="selectManualMedDay('hoy')" class="py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-emerald-600 text-white border-2 border-emerald-700 shadow transition flex items-center justify-center gap-2">
+                        <span>☀️ Para Hoy</span>
+                    </button>
+                    <button type="button" id="btnDayManana" onclick="selectManualMedDay('manana')" class="py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-amber-50 transition flex items-center justify-center gap-2">
+                        <span>🌅 Para Mañana</span>
+                    </button>
+                </div>
+
+                <select id="medAnchor" onchange="onAnchorChange()" class="hidden">
+                    <option value="desayuno" selected>Con el desayuno (08:00)</option>
+                    <option value="almuerzo">Con el almuerzo (13:00)</option>
+                    <option value="once">Con la once (18:00)</option>
+                    <option value="dormir">Antes de dormir (21:30)</option>
+                </select>
+                <input id="medTime" type="hidden" value="08:00">
+
+                <!-- Nombre del remedio y botón de dictado por voz -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input id="medName" type="text" oninput="checkWrongSectionInMeds()" placeholder="Ej.: Paracetamol 500mg, Losartán..." class="flex-1 px-4 py-3.5 text-lg border-2 border-slate-300 rounded-2xl focus:border-blue-600 focus:outline-none">
+                    <button type="button" onclick="startVoiceInput('medName', 'Diga su remedio, hora o día')" class="px-5 py-3.5 bg-blue-100 hover:bg-blue-200 text-blue-950 border-2 border-blue-500 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 shrink-0 transition">
+                        <i class="fa-solid fa-microphone text-xl text-blue-700"></i><span>Dictar remedio</span>
+                    </button>
+                </div>
+
+                <!-- Selector de otro día o fecha específica -->
+                <div id="medCustomDayRow" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl bg-slate-50 border border-slate-200 px-3.5 py-2.5">
+                    <label for="medDatePicker" class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <i class="fa-regular fa-calendar-days text-blue-600"></i>
+                        <span>Otro día o fecha:</span>
+                    </label>
+                    <input id="medDatePicker" type="date" onchange="onMedDatePickerChange()" class="px-3 py-1.5 text-sm font-bold text-slate-900 bg-white border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none">
+                </div>
+
+                <!-- Modal de aviso si detecta un producto de compra en Remedios -->
+                <div id="medWrongSectionAlert" class="hidden fixed inset-0 z-50 bg-red-950/35 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="max-w-md w-full rounded-3xl p-6 border-2 border-red-400 bg-red-50/95 text-red-950 shadow-2xl space-y-4">
+                        <p id="medWrongSectionMsg" class="text-lg font-extrabold leading-snug"></p>
+                        <button type="button" onclick="redirectFromMedToShop()" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base rounded-2xl shadow flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-arrow-right"></i><span>Ir a Compras y llevar este producto</span>
+                        </button>
+                        <button type="button" onclick="closeWrongSectionModals()" class="w-full py-2.5 px-4 bg-white hover:bg-red-100 text-red-900 border border-red-300 font-bold text-sm rounded-xl transition">
+                            Cerrar aviso
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" onclick="addMed()" class="w-full py-4 text-xl font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-2xl shadow-md transition">
+                    Guardar Remedio
+                </button>
+                <p id="formMsg" class="text-base font-bold text-red-600 text-center"></p>
+
+                <!-- Bloque de Verificación de Lista Dictada por Voz (Remedios) -->
+                <div id="medVoiceBatchBox" class="hidden rounded-3xl border-2 border-blue-400 bg-blue-50/90 p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="text-base sm:text-lg font-extrabold text-blue-950">
+                            <i class="fa-solid fa-list-check mr-1.5 text-blue-600"></i>Verifique los remedios dictados
+                        </h4>
+                        <span id="medVoiceBatchCount" class="text-xs font-extrabold bg-blue-200 text-blue-950 px-2.5 py-1 rounded-full">0 detectados</span>
+                    </div>
+                    <p class="text-sm text-slate-700 font-semibold">Revise o edite cada remedio antes de agregarlo a su lista:</p>
+                    <textarea id="medVoiceBatchTextarea" rows="4" oninput="refreshVoiceBatchCount('med')" class="w-full p-3 text-base font-bold text-slate-900 bg-white border-2 border-blue-300 rounded-2xl focus:border-blue-600 focus:outline-none" placeholder="Un remedio por línea..."></textarea>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button type="button" onclick="confirmBatchVoiceItems('med')" class="py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-base rounded-2xl shadow transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i><span>Agregar lista</span>
+                        </button>
+                        <button type="button" onclick="retryBatchVoiceItems('med')" class="py-3 px-4 bg-white hover:bg-blue-100 text-blue-950 border-2 border-blue-300 font-extrabold text-base rounded-2xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i><span>Volver a dictar</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VISTA 2: COMPRAS -->
+        <!-- ========================================== -->
+        <div id="view-supermercado" class="template-view space-y-6">
+            <section class="rounded-3xl border-2 border-emerald-500 bg-emerald-50 p-5 shadow-sm text-center">
+                <p class="text-sm font-extrabold uppercase tracking-wider text-emerald-900">Lista de compras · Sra. Carmen</p>
+                <p id="goalText" class="text-2xl font-extrabold text-slate-900 mt-1"></p>
+                <div class="w-full bg-emerald-200 rounded-full h-4 mt-3 overflow-hidden">
+                    <div id="progressBar" class="bg-emerald-600 h-4 rounded-full transition-all duration-300" style="width:0%"></div>
+                </div>
+            </section>
+
+            <!-- Agregar producto por Voz o Texto -->
+            <section class="bg-white rounded-3xl border-2 border-slate-200 p-5 shadow-sm space-y-4">
+                <h3 class="text-xl font-extrabold text-slate-900">¿Qué necesita comprar hoy?</h3>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input id="newItem" type="text" oninput="onShopItemInputChange()" placeholder="Ej.: Café, pan, leche, manzanas..." class="flex-1 px-4 py-3.5 text-lg border-2 border-slate-300 rounded-2xl focus:border-emerald-600 focus:outline-none">
+                    <button type="button" onclick="startVoiceInput('newItem', 'Diga el producto que desea anotar')" class="px-5 py-3.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 border-2 border-emerald-500 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 shrink-0 transition">
+                        <i class="fa-solid fa-microphone text-xl text-emerald-700"></i><span>Dictar producto</span>
+                    </button>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <select id="newSection" class="flex-1 px-4 py-3.5 text-lg border-2 border-slate-300 rounded-2xl bg-white font-bold"></select>
+                    <button type="button" onclick="addItem()" class="px-6 py-3.5 text-lg font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 rounded-2xl shadow transition">
+                        Anotar en lista
+                    </button>
+                </div>
+                <p id="shopAutoCatHint" class="text-sm font-bold text-emerald-800 hidden"></p>
+
+                <!-- Modal de aviso si detecta un medicamento en Compras -->
+                <div id="shopWrongSectionAlert" class="hidden fixed inset-0 z-50 bg-red-950/35 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="max-w-md w-full rounded-3xl p-6 border-2 border-red-400 bg-red-50/95 text-red-950 shadow-2xl space-y-4">
+                        <p id="shopWrongSectionMsg" class="text-lg font-extrabold leading-snug"></p>
+                        <button type="button" onclick="redirectFromShopToMed()" class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-base rounded-2xl shadow flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-arrow-right"></i><span>Ir a Remedios y anotar este medicamento</span>
+                        </button>
+                        <button type="button" onclick="closeWrongSectionModals()" class="w-full py-2.5 px-4 bg-white hover:bg-red-100 text-red-900 border border-red-300 font-bold text-sm rounded-xl transition">
+                            Cerrar aviso
+                        </button>
+                    </div>
+                </div>
+
+                <p id="shopFormMsg" class="text-base font-bold text-red-600 text-center"></p>
+
+                <!-- Bloque de Verificación de Lista Dictada por Voz (Compras) -->
+                <div id="shopVoiceBatchBox" class="hidden rounded-3xl border-2 border-emerald-500 bg-emerald-50/90 p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <h4 class="text-base sm:text-lg font-extrabold text-emerald-950">
+                            <i class="fa-solid fa-list-check mr-1.5 text-emerald-600"></i>Verifique los alimentos dictados
+                        </h4>
+                        <span id="shopVoiceBatchCount" class="text-xs font-extrabold bg-emerald-200 text-emerald-950 px-2.5 py-1 rounded-full">0 detectados</span>
+                    </div>
+                    <p class="text-sm text-slate-700 font-semibold">Revise o ajuste los productos detectados; cada uno tomará su categoría automáticamente:</p>
+                    <textarea id="shopVoiceBatchTextarea" rows="4" oninput="refreshVoiceBatchCount('shop')" class="w-full p-3 text-base font-bold text-slate-900 bg-white border-2 border-emerald-400 rounded-2xl focus:border-emerald-600 focus:outline-none" placeholder="Un alimento por línea..."></textarea>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button type="button" onclick="confirmBatchVoiceItems('shop')" class="py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base rounded-2xl shadow transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i><span>Agregar lista</span>
+                        </button>
+                        <button type="button" onclick="retryBatchVoiceItems('shop')" class="py-3 px-4 bg-white hover:bg-emerald-100 text-emerald-950 border-2 border-emerald-400 font-extrabold text-base rounded-2xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i><span>Volver a dictar</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Botón de ayuda si se distrae conversando (99 frases rotativas) -->
+            <button type="button" onclick="distracted()" class="w-full py-4 text-lg font-extrabold bg-amber-100 border-2 border-amber-400 text-amber-950 rounded-2xl hover:bg-amber-200 transition shadow-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-comments text-xl"></i><span>Me puse a conversar (Ayuda para volver)</span>
+            </button>
+            <p id="refocus" class="hidden text-lg text-slate-900 bg-white p-4 rounded-2xl border-2 border-amber-400 font-bold shadow-sm"></p>
+
+            <!-- Lista de productos agrupada por pasillos -->
+            <div id="routeList" class="space-y-4"></div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VISTA EXCLUSIVA HIJA: REGISTRO Y APORTES -->
+        <!-- ========================================== -->
+        <div id="view-hija" class="template-view space-y-6">
+            <div class="bg-indigo-50 border-2 border-indigo-300 rounded-3xl p-5 shadow-sm">
+                <h2 class="text-2xl font-extrabold text-indigo-950 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-user text-indigo-600"></i> Panel de Supervisión Familiar (Hija)
+                </h2>
+                <p class="text-base text-slate-700 font-medium mt-1">Revise en tiempo real lo que Sra. Carmen ha registrado hoy y deje recordatorios o productos en su lista.</p>
+            </div>
+
+            <!-- Resumen de Cumplimiento del Día -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-white border-2 border-blue-200 rounded-3xl p-5 shadow-sm">
+                    <p class="text-base font-extrabold uppercase text-blue-900">Estado de Remedios Hoy</p>
+                    <p id="daughterMedSummary" class="text-lg sm:text-xl font-bold text-slate-900 mt-2"></p>
+                </div>
+                <div class="bg-white border-2 border-emerald-200 rounded-3xl p-5 shadow-sm">
+                    <p class="text-base font-extrabold uppercase text-emerald-900">Estado de Compras Hoy</p>
+                    <p id="daughterShopSummary" class="text-lg sm:text-xl font-bold text-slate-900 mt-2"></p>
+                </div>
+            </div>
+
+            <!-- Notas de la Bitácora Móvil Sincronizadas por localStorage -->
+            <section class="bg-white rounded-3xl border-2 border-indigo-200 p-5 shadow-sm space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <h3 class="text-lg font-extrabold text-indigo-950 flex items-center gap-2">
+                        <i class="fa-solid fa-book-medical text-indigo-600"></i>
+                        <span>Notas desde Bitácora Móvil</span>
+                    </h3>
+                    <span class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900">Sincronizado</span>
+                </div>
+                <p class="text-sm text-slate-600 font-semibold">Se muestran las notas guardadas en la bitácora móvil del mismo navegador/dominio.</p>
+                <ul id="daughterBitacoraNotesList" class="space-y-2"></ul>
+            </section>
+
+            <!-- Aportes Directos de la Hija para Sra. Carmen -->
+            <section class="bg-white rounded-3xl border-2 border-indigo-200 p-5 shadow-sm space-y-5">
+                <h3 class="text-xl font-extrabold text-slate-900 border-b pb-2">Aportar o agregar tareas para Sra. Carmen</h3>
+
+                <div class="space-y-2">
+                    <label for="daughterShopInput" class="block text-base font-bold text-slate-800">1. Añadir producto a su lista del supermercado:</label>
+                    <div class="flex gap-2">
+                        <input id="daughterShopInput" type="text" placeholder="Ej.: Yogur natural, té..." class="flex-1 px-4 py-3 border-2 border-slate-300 rounded-2xl text-base sm:text-lg">
+                        <button type="button" onclick="daughterAddShopItem()" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-2xl shadow">Añadir</button>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t">
+                    <label for="daughterMedInput" class="block text-base font-bold text-slate-800">2. Añadir medicamento o vitamina a Sra. Carmen:</label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input id="daughterMedInput" type="text" placeholder="Ej.: Vitamina D..." class="flex-1 px-4 py-3 border-2 border-slate-300 rounded-2xl text-base sm:text-lg">
+                        <input id="daughterMedTime" type="time" value="18:00" class="px-4 py-3 border-2 border-slate-300 rounded-2xl text-base sm:text-lg font-bold">
+                        <button type="button" onclick="daughterAddMed()" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base rounded-2xl shadow">Añadir</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gestión y Eliminación de Medicamentos y Compras desde la Hija -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <section class="bg-white rounded-3xl border-2 border-blue-200 p-5 shadow-sm space-y-3">
+                    <h3 class="text-lg font-extrabold text-blue-950 flex items-center justify-between">
+                        <span><i class="fa-solid fa-pills mr-1.5 text-blue-600"></i>Remedios de Sra. Carmen</span>
+                    </h3>
+                    <ul id="daughterMedsManageList" class="space-y-2"></ul>
+                </section>
+
+                <section class="bg-white rounded-3xl border-2 border-emerald-200 p-5 shadow-sm space-y-3">
+                    <h3 class="text-lg font-extrabold text-emerald-950 flex items-center justify-between">
+                        <span><i class="fa-solid fa-cart-shopping mr-1.5 text-emerald-600"></i>Compras de Sra. Carmen</span>
+                    </h3>
+                    <ul id="daughterShopManageList" class="space-y-2"></ul>
+                </section>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Overlay Visual de Grabación de Voz -->
+    <div id="voiceModal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl border-4 border-emerald-500">
+            <div id="voiceMicCircle" class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <i class="fa-solid fa-microphone text-3xl"></i>
+            </div>
+            <h3 id="voicePromptTitle" class="text-xl font-extrabold text-slate-900">Escuchando...</h3>
+            <p id="voiceLiveTranscript" class="text-base text-emerald-700 font-bold italic min-h-[24px]">Hable claro cerca del micrófono...</p>
+            <div id="voiceProcessingBanner" class="hidden rounded-2xl bg-emerald-50 border-2 border-emerald-400 px-4 py-3 flex items-center justify-center gap-3 text-emerald-950 font-extrabold text-base">
+                <i class="fa-solid fa-circle-notch fa-spin text-emerald-600 text-xl"></i>
+                <span id="voiceProcessingLabel">Procesando lo que dijo...</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                <div id="voiceLevelBar" class="bg-emerald-500 h-3 rounded-full transition-all duration-100" style="width:0%"></div>
+            </div>
+
+            <button type="button" id="btnStopAndTranscribe" onclick="finishAudioRecording()" class="hidden w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl text-lg shadow-md transition">
+                <i class="fa-solid fa-check mr-2"></i>Listo, ya hablé
+            </button>
+
+            <!-- Respaldo interactivo para escribir o elegir rápido -->
+            <div id="voiceFallbackBox" class="hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-3 text-left space-y-2">
+                <p id="voiceFallbackReason" class="text-xs font-bold text-amber-900"><i class="fa-solid fa-circle-info mr-1"></i>Escriba aquí lo que dijo o elija una frase rápida:</p>
+                <div class="flex flex-wrap gap-1.5" id="voiceQuickChips"></div>
+                <div class="flex gap-2 pt-1">
+                    <input id="voiceManualSimInput" type="text" onkeydown="if(event.key==='Enter'){applyManualVoiceSim();}" placeholder="Escriba aquí..." class="flex-1 px-3 py-2 text-sm border border-amber-400 rounded-xl bg-white">
+                    <button type="button" onclick="applyManualVoiceSim()" class="px-3 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">Usar</button>
+                </div>
+            </div>
+
+            <button type="button" onclick="stopVoiceRecognition()" class="w-full py-3 bg-slate-800 text-white font-bold rounded-2xl text-base">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Notificación Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-base sm:text-lg font-extrabold px-6 py-4 rounded-2xl shadow-2xl transform translate-y-28 opacity-0 transition-all duration-300 flex items-center space-x-3 z-50 border-2 border-emerald-400 w-[90%] max-w-md justify-center">
+        <i class="fa-solid fa-circle-check text-2xl text-emerald-400 shrink-0"></i>
+        <span id="toastMsg">Listo</span>
+    </div>
+
+    <!-- Footer con Créditos -->
+    <footer class="bg-white border-t border-slate-200 mt-auto w-full">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-600 font-medium">
+            <p class="font-bold text-slate-800">
+                <span class="fonovibe-wordmark font-extrabold">FonoVibe</span> · Apoyo cognitivo y familiar para Sra. Carmen
+            </p>
+            <p>Creado por <span class="font-bold text-slate-800">Alexis Arriagada</span> y <span class="font-bold text-slate-800">Martina Coronado</span></p>
+        </div>
+    </footer>
+
+    <script>
+        var currentRole = 'usuaria';
+        var currentSimpleTab = 'medicamento';
+        var isHeaderCompact = false;
+        var sharedNotes = [];
+        var selectedManualMedDay = 'hoy';
+
+        // --- CAMBIO DE ROL: SRA. CARMEN VS HIJA ---
+        function updateDynamicHeaderTitle() {
+            var titleEl = document.getElementById('brandTitle');
+            var iconBox = document.getElementById('brandIconBox');
+            var iconEl = document.getElementById('brandIcon');
+            var compactPad = isHeaderCompact ? 'p-1.5 rounded-xl' : 'p-2.5 rounded-2xl';
+            var iconSize = isHeaderCompact ? 'text-base' : 'text-xl';
+
+            if (!titleEl || !iconBox || !iconEl) return;
+
+            if (currentRole === 'hija') {
+                titleEl.textContent = 'Registro Familiar';
+                iconBox.className = 'bg-indigo-600 ' + compactPad + ' text-white shadow transition-all duration-300';
+                iconEl.className = 'fa-solid fa-clipboard-user ' + iconSize;
+            } else if (currentSimpleTab === 'medicamento') {
+                titleEl.textContent = 'Remedios';
+                iconBox.className = 'bg-blue-600 ' + compactPad + ' text-white shadow transition-all duration-300';
+                iconEl.className = 'fa-solid fa-pills ' + iconSize;
+            } else {
+                titleEl.textContent = 'Compras';
+                iconBox.className = 'bg-emerald-600 ' + compactPad + ' text-white shadow transition-all duration-300';
+                iconEl.className = 'fa-solid fa-cart-shopping ' + iconSize;
+            }
+        }
+
+        function updateGreetingBanner() {
+            updateLiveClockDisplay();
+        }
+
+        function setUserRole(role) {
+            currentRole = role;
+            var btnUser = document.getElementById('btnRoleUsuaria');
+            var btnHija = document.getElementById('btnRoleHija');
+            var navTabs = document.getElementById('mainNavTabs');
+
+            if (role === 'usuaria') {
+                btnUser.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-600 text-white shadow transition flex items-center gap-1.5 whitespace-nowrap';
+                btnHija.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap';
+                navTabs.classList.remove('hidden');
+                var safeTab = (currentSimpleTab === 'supermercado') ? 'supermercado' : 'medicamento';
+                selectSimpleTab(safeTab);
+            } else {
+                btnHija.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold bg-indigo-600 text-white shadow transition flex items-center gap-1.5 whitespace-nowrap';
+                btnUser.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:bg-white transition flex items-center gap-1.5 whitespace-nowrap';
+                navTabs.classList.add('hidden');
+                showOnlyView('hija');
+                updateDaughterDashboard();
+            }
+            updateDynamicHeaderTitle();
+            handleHeaderScrollState(true);
+        }
+
+        // --- NAVEGACIÓN DE 2 BOTONES PARA SRA. CARMEN ---
+        function showOnlyView(viewKey) {
+            var views = document.querySelectorAll('.template-view');
+            views.forEach(function(v) {
+                v.classList.remove('active');
+            });
+            var target = document.getElementById('view-' + viewKey);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        function selectSimpleTab(tabKey) {
+            currentSimpleTab = (tabKey === 'supermercado') ? 'supermercado' : 'medicamento';
+            applyNavTabStyles();
+            showOnlyView(currentSimpleTab);
+            updateDynamicHeaderTitle();
+            handleHeaderScrollState(true);
+        }
+
+        function applyNavTabStyles() {
+            var tabs = {
+                medicamento: { active: 'bg-blue-600 text-white shadow', iconColor: 'text-blue-700', hover: 'hover:bg-blue-50' },
+                supermercado: { active: 'bg-emerald-600 text-white shadow', iconColor: 'text-emerald-700', hover: 'hover:bg-emerald-50' }
+            };
+
+            Object.keys(tabs).forEach(function(k) {
+                var btn = document.getElementById('nav-' + k);
+                if (!btn) return;
+                var icon = btn.querySelector('.nav-icon');
+                var isSelected = (currentSimpleTab === k);
+
+                var sizeClasses = isHeaderCompact
+                    ? 'py-1.5 px-2 rounded-xl text-xs sm:text-sm flex-row gap-1.5'
+                    : 'py-3.5 px-2 rounded-2xl text-base sm:text-lg flex-col sm:flex-row gap-1.5';
+
+                if (isSelected) {
+                    btn.className = sizeClasses + ' font-extrabold ' + tabs[k].active + ' flex items-center justify-center transition-all duration-300';
+                    if (icon) icon.className = 'fa-solid ' + (k === 'medicamento' ? 'fa-pills' : 'fa-cart-shopping') + (isHeaderCompact ? ' text-sm ' : ' text-xl ') + 'text-white nav-icon transition-all';
+                } else {
+                    btn.className = sizeClasses + ' font-bold bg-white/95 text-slate-800 ' + tabs[k].hover + ' border-2 border-slate-200 flex items-center justify-center transition-all duration-300';
+                    if (icon) icon.className = 'fa-solid ' + (k === 'medicamento' ? 'fa-pills' : 'fa-cart-shopping') + (isHeaderCompact ? ' text-sm ' : ' text-xl ') + tabs[k].iconColor + ' nav-icon transition-all';
+                }
+            });
+        }
+
+        // --- MINIMIZACIÓN DE HEADER Y RELOJ ---
+        var scrollLockTimer = null;
+        var isScrollLocked = false;
+        var currentWeatherEmoji = '🌤️';
+        var lastObservedScrollTop = 0;
+
+        function getCurrentScrollTop() {
+            var winScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            var viewportEl = document.getElementById('appViewport');
+            var viewportScroll = viewportEl ? viewportEl.scrollTop : 0;
+            return Math.max(winScroll, viewportScroll);
+        }
+
+        function mapWeatherCodeToEmoji(code, isDay) {
+            if (code === 0) return isDay ? '☀️' : '🌙';
+            if (code === 1 || code === 2) return isDay ? '🌤️' : '☁️';
+            if (code === 3) return '☁️';
+            if (code === 45 || code === 48) return '🌫️';
+            if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '🌧️';
+            if ((code >= 71 && code <= 77) || code === 85 || code === 86) return '❄️';
+            if (code >= 95) return '⛈️';
+            return isDay ? '🌤️' : '✨';
+        }
+
+        async function fetchCurrentWeatherEmoji() {
+            try {
+                var lat = -38.7359;
+                var lon = -72.5904;
+                var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true';
+                var res = await fetch(url);
+                var data = await res.json();
+                if (data && data.current_weather) {
+                    currentWeatherEmoji = mapWeatherCodeToEmoji(data.current_weather.weathercode, data.current_weather.is_day === 1);
+                    updateLiveClockDisplay();
+                }
+            } catch (e) {}
+        }
+
+        function updateLiveClockDisplay() {
+            var d = new Date();
+            var hrs = d.getHours();
+            var timeStr = pad(hrs) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+            var headerClock = document.getElementById('headerClockText');
+            if (headerClock) headerClock.textContent = timeStr;
+
+            var clockEl = document.getElementById('clockLine');
+            if (clockEl) {
+                clockEl.textContent = 'Hoy es ' + d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + timeStr + ' hrs';
+            }
+
+            var timeEmoji = '☀️';
+            var greeting = 'Buenos días';
+            if (hrs >= 6 && hrs < 12) {
+                timeEmoji = '🌅';
+                greeting = 'Buenos días';
+            } else if (hrs >= 12 && hrs < 20) {
+                timeEmoji = '☀️';
+                greeting = 'Buenas tardes';
+            } else {
+                timeEmoji = '🌙';
+                greeting = 'Buenas noches';
+            }
+
+            var emojisEl = document.getElementById('timeWeatherEmojis');
+            var greetEl = document.getElementById('greetingText');
+            if (emojisEl) emojisEl.textContent = timeEmoji + ' ' + currentWeatherEmoji;
+            if (greetEl) greetEl.textContent = greeting + ', Sra. Carmen';
+        }
+
+        function handleHeaderScrollState(forceSync) {
+            if (isScrollLocked && !forceSync) return;
+
+            var scrollTop = getCurrentScrollTop();
+            var docHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+            var maxScroll = docHeight - window.innerHeight;
+            var scrollingDown = scrollTop > lastObservedScrollTop + 4;
+            var scrollingUp = scrollTop < lastObservedScrollTop - 4;
+            lastObservedScrollTop = scrollTop;
+
+            var shouldCompact = isHeaderCompact;
+
+            if (scrollTop <= 12) {
+                shouldCompact = false;
+            } else if (scrollingDown && scrollTop > 70 && maxScroll > 60) {
+                shouldCompact = true;
+            } else if (scrollingUp && scrollTop <= 40) {
+                shouldCompact = false;
+            } else if (!isHeaderCompact && scrollTop > 130 && maxScroll > 60) {
+                shouldCompact = true;
+            }
+
+            if (shouldCompact !== isHeaderCompact) {
+                isHeaderCompact = shouldCompact;
+                isScrollLocked = true;
+                clearTimeout(scrollLockTimer);
+                scrollLockTimer = setTimeout(function() {
+                    isScrollLocked = false;
+                }, 260);
+            }
+
+            var header = document.getElementById('mainHeader');
+            var inner = document.getElementById('headerInner');
+            var topRow = document.getElementById('headerTopRow');
+            var subtitle = document.getElementById('brandSubtitle');
+            var brandTitle = document.getElementById('brandTitle');
+            var navTabs = document.getElementById('mainNavTabs');
+            var miniClock = document.getElementById('headerMiniClock');
+            var centerSlot = document.getElementById('fonovibeCenterSlot');
+            var centerBadge = document.getElementById('fonovibeCenterBadge');
+
+            if (isHeaderCompact) {
+                header.className = 'bg-white/90 backdrop-blur-md border-b-2 border-emerald-600 sticky top-0 z-40 shadow-md w-full overflow-x-clip transition-all duration-300';
+                inner.className = 'max-w-4xl mx-auto px-4 sm:px-6 py-2 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 lg:gap-4 transition-all duration-300';
+                if (topRow) topRow.className = 'flex flex-wrap items-center justify-between gap-2.5 min-w-0 transition-all duration-300';
+                if (subtitle) subtitle.classList.add('hidden');
+                if (brandTitle) brandTitle.className = 'font-extrabold text-base sm:text-lg text-slate-900 tracking-tight transition-all duration-300';
+                if (centerSlot) centerSlot.className = 'hidden';
+                if (centerBadge) centerBadge.className = 'hidden';
+                if (navTabs) navTabs.className = 'grid grid-cols-2 gap-2 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-slate-200 w-full lg:w-auto lg:min-w-[300px] transition-all duration-300' + (currentRole === 'hija' ? ' hidden' : '');
+            } else {
+                header.className = 'bg-white/95 backdrop-blur-md border-b-2 border-emerald-600 sticky top-0 z-40 shadow-sm w-full overflow-x-clip transition-all duration-300';
+                inner.className = 'max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-3 transition-all duration-300';
+                if (topRow) topRow.className = 'grid grid-cols-1 lg:grid-cols-3 items-center gap-3 sm:gap-4 transition-all duration-300';
+                if (subtitle) subtitle.classList.remove('hidden');
+                if (brandTitle) brandTitle.className = 'font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight transition-all duration-300';
+                if (centerSlot) centerSlot.className = 'flex items-center justify-center transition-all duration-300';
+                if (centerBadge) centerBadge.className = 'fonovibe-brand-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full select-none shrink-0 opacity-100 scale-100 transition-all duration-300';
+                if (navTabs) navTabs.className = 'grid grid-cols-2 gap-2.5 sm:gap-3 pt-2 border-t border-slate-200 w-full transition-all duration-300' + (currentRole === 'hija' ? ' hidden' : '');
+            }
+
+            updateDynamicHeaderTitle();
+
+            if (miniClock) {
+                if (currentRole === 'usuaria' && currentSimpleTab === 'medicamento' && isHeaderCompact) {
+                    miniClock.classList.remove('hidden');
+                    miniClock.classList.add('flex');
+                } else {
+                    miniClock.classList.add('hidden');
+                    miniClock.classList.remove('flex');
+                }
+            }
+
+            applyNavTabStyles();
+        }
+
+        window.addEventListener('scroll', function() { handleHeaderScrollState(false); }, { passive: true });
+        document.addEventListener('scroll', function() { handleHeaderScrollState(false); }, { passive: true, capture: true });
+
+        // --- RECONOCIMIENTO DE VOZ Y HABLA CONECTADA ---
+        var recognition = null;
+        var activeVoiceTargetId = null;
+        var activeMediaStream = null;
+        var audioCaptureCtx = null;
+        var audioProcessorNode = null;
+        var voiceMeterRaf = null;
+        var recordedPcmSamples = [];
+        var recordedSampleRate = 16000;
+        var detectedVoicePeak = 0;
+        var isVoiceFinished = false;
+        var isRecognitionRunning = false;
+        var liveRecognizedSpeech = '';
+        var hasAutoSubmittedSpeech = false;
+        var recognitionRestartTimer = null;
+
+        function setVoiceMeterLevel(pct) {
+            var bar = document.getElementById('voiceLevelBar');
+            if (bar) {
+                var clamped = Math.max(0, Math.min(100, Math.round(pct)));
+                bar.style.width = clamped + '%';
+            }
+        }
+
+        function setVoiceProcessingSignal(active, labelText) {
+            var banner = document.getElementById('voiceProcessingBanner');
+            var labelEl = document.getElementById('voiceProcessingLabel');
+            if (labelEl && labelText) labelEl.textContent = labelText;
+            if (!banner) return;
+            if (active) {
+                banner.classList.remove('hidden');
+                setVoiceMeterLevel(78);
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function clearActiveRecognitionInstance() {
+            isRecognitionRunning = false;
+            if (recognitionRestartTimer) {
+                clearTimeout(recognitionRestartTimer);
+                recognitionRestartTimer = null;
+            }
+            if (!recognition) return;
+            var currentRec = recognition;
+            recognition = null;
+            try {
+                currentRec.onstart = null;
+                currentRec.onspeechend = null;
+                currentRec.onresult = null;
+                currentRec.onerror = null;
+                currentRec.onend = null;
+                currentRec.stop();
+            } catch (e) {}
+            try {
+                currentRec.abort();
+            } catch (e) {}
+        }
+
+        async function consumeRecognizedSpeechAndClose(spokenText) {
+            var clean = (spokenText || '').trim();
+            if (!clean || hasAutoSubmittedSpeech) return;
+            hasAutoSubmittedSpeech = true;
+            isVoiceFinished = true;
+            clearActiveRecognitionInstance();
+            cleanupAudioCapture();
+            recordedPcmSamples = [];
+
+            setVoiceProcessingSignal(true, 'Cargando...');
+            var stopBtn = document.getElementById('btnStopAndTranscribe');
+            if (stopBtn) stopBtn.classList.add('hidden');
+
+            try {
+                await insertVoiceText(clean);
+            } finally {
+                setVoiceProcessingSignal(false);
+                stopVoiceRecognition();
+            }
+        }
+
+        function startVoiceInput(targetInputId, promptMessage) {
+            stopVoiceRecognition();
+
+            isVoiceFinished = false;
+            hasAutoSubmittedSpeech = false;
+            isRecognitionRunning = false;
+            detectedVoicePeak = 0;
+            liveRecognizedSpeech = '';
+            activeVoiceTargetId = targetInputId;
+
+            var modalEl = document.getElementById('voiceModal');
+            var titleEl = document.getElementById('voicePromptTitle');
+            var liveEl = document.getElementById('voiceLiveTranscript');
+            var stopBtn = document.getElementById('btnStopAndTranscribe');
+            var manualInp = document.getElementById('voiceManualSimInput');
+            var fallbackBox = document.getElementById('voiceFallbackBox');
+
+            if (titleEl && promptMessage) titleEl.innerText = promptMessage;
+            if (liveEl) {
+                liveEl.className = 'text-base text-emerald-700 font-bold italic min-h-[24px]';
+                liveEl.innerText = '🎙️ Escuchando... hable con naturalidad o toque «Listo, ya hablé».';
+            }
+            if (fallbackBox) fallbackBox.classList.add('hidden');
+
+            setVoiceMeterLevel(16);
+            setVoiceProcessingSignal(false);
+            if (stopBtn) stopBtn.classList.remove('hidden');
+            if (manualInp) manualInp.value = '';
+            if (modalEl) modalEl.classList.remove('hidden');
+
+            startDirectPcmRecording();
+
+            var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                if (liveEl) {
+                    liveEl.innerText = '🎙️ Hable ahora y toque «Listo, ya hablé» (o escriba abajo).';
+                }
+                activateVoiceFallback('Escriba lo que dijo con naturalidad o elija una frase rápida:');
+                return;
+            }
+
+            try {
+                var rec = new SpeechRecognition();
+                recognition = rec;
+                rec.lang = 'es-CL';
+                rec.continuous = true;
+                rec.interimResults = true;
+                rec.maxAlternatives = 3;
+
+                var collectedFinal = '';
+                var collectedInterim = '';
+                var fallbackLangTried = false;
+                var restartCount = 0;
+
+                function safeStartSpeech(targetRec) {
+                    if (!targetRec || recognition !== targetRec || isVoiceFinished || hasAutoSubmittedSpeech || isRecognitionRunning) return;
+                    try {
+                        targetRec.start();
+                        isRecognitionRunning = true;
+                    } catch (e) {
+                        var m = (e && e.message) ? String(e.message) : '';
+                        if (/already started/i.test(m) || (e && e.name === 'InvalidStateError')) {
+                            isRecognitionRunning = true;
+                        }
+                    }
+                }
+
+                rec.onstart = function() {
+                    if (recognition !== rec) return;
+                    isRecognitionRunning = true;
+                    if (isVoiceFinished) return;
+                    if (liveEl && !liveRecognizedSpeech.trim()) {
+                        liveEl.className = 'text-base text-emerald-700 font-bold italic min-h-[24px]';
+                        liveEl.innerText = '🎙️ ¡Micrófono activo! Hable con naturalidad...';
+                    }
+                };
+
+                rec.onspeechend = function() {
+                    if (recognition !== rec || isVoiceFinished || hasAutoSubmittedSpeech) return;
+                    if (liveRecognizedSpeech.trim()) {
+                        consumeRecognizedSpeechAndClose(liveRecognizedSpeech.trim());
+                    }
+                };
+
+                rec.onresult = function(event) {
+                    if (recognition !== rec || isVoiceFinished || hasAutoSubmittedSpeech) return;
+                    var interimChunk = '';
+                    var finalChunk = '';
+
+                    for (var i = event.resultIndex; i < event.results.length; ++i) {
+                        var alt0 = event.results[i][0];
+                        var transcript = (alt0 && alt0.transcript) ? alt0.transcript : '';
+                        if (event.results[i].isFinal) {
+                            finalChunk += transcript + ' ';
+                        } else {
+                            interimChunk += transcript + ' ';
+                        }
+                    }
+
+                    if (finalChunk.trim()) {
+                        collectedFinal = (collectedFinal + ' ' + finalChunk.trim()).trim();
+                    }
+                    collectedInterim = interimChunk.trim();
+
+                    var combined = (collectedFinal + ' ' + collectedInterim).trim();
+                    if (combined) {
+                        liveRecognizedSpeech = combined;
+                    }
+
+                    if (liveRecognizedSpeech && liveEl) {
+                        liveEl.className = 'text-lg text-slate-900 font-extrabold not-italic min-h-[24px]';
+                        liveEl.innerText = '«' + liveRecognizedSpeech + '»';
+                    }
+                };
+
+                rec.onerror = function(ev) {
+                    if (recognition !== rec) return;
+                    isRecognitionRunning = false;
+                    if (isVoiceFinished || hasAutoSubmittedSpeech) return;
+
+                    var errCode = ev && ev.error ? ev.error : '';
+                    if (liveRecognizedSpeech.trim()) {
+                        consumeRecognizedSpeechAndClose(liveRecognizedSpeech.trim());
+                        return;
+                    }
+
+                    if ((errCode === 'language-not-supported' || errCode === 'network' || errCode === 'audio-capture') && !fallbackLangTried) {
+                        fallbackLangTried = true;
+                        rec.lang = rec.lang === 'es-CL' ? 'es-ES' : 'es-CL';
+                        recognitionRestartTimer = setTimeout(function() {
+                            safeStartSpeech(rec);
+                        }, 180);
+                        return;
+                    }
+
+                    if (errCode === 'not-allowed' || errCode === 'service-not-allowed') {
+                        activateVoiceFallback('Permita el acceso al micrófono del navegador o escriba aquí:');
+                    } else if (errCode !== 'aborted') {
+                        activateVoiceFallback('Escriba lo que dijo o elija una frase rápida:');
+                    }
+                };
+
+                rec.onend = function() {
+                    if (recognition !== rec) return;
+                    isRecognitionRunning = false;
+                    if (isVoiceFinished || hasAutoSubmittedSpeech) return;
+
+                    if (liveRecognizedSpeech.trim()) {
+                        consumeRecognizedSpeechAndClose(liveRecognizedSpeech.trim());
+                        return;
+                    }
+
+                    if (restartCount < 2) {
+                        restartCount++;
+                        recognitionRestartTimer = setTimeout(function() {
+                            safeStartSpeech(rec);
+                        }, 220);
+                        return;
+                    }
+
+                    if (liveEl) {
+                        liveEl.className = 'text-base text-emerald-700 font-bold italic min-h-[24px]';
+                        liveEl.innerText = '🎙️ Hable y toque «Listo, ya hablé» (o escriba abajo).';
+                    }
+                    activateVoiceFallback('Si no se transcribió automáticamente, escriba lo que dijo o elija una frase rápida:');
+                };
+
+                safeStartSpeech(rec);
+            } catch (err) {
+                activateVoiceFallback('Escriba lo que dijo o elija una frase rápida:');
+            }
+        }
+
+        async function startDirectPcmRecording() {
+            if (isVoiceFinished) return;
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                activateVoiceFallback('Escriba lo que dijo o elija una frase rápida:');
+                return;
+            }
+            try {
+                activeMediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                if (isVoiceFinished) {
+                    activeMediaStream.getTracks().forEach(function(t) { t.stop(); });
+                    activeMediaStream = null;
+                    return;
+                }
+
+                var AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+
+                audioCaptureCtx = new AudioCtx();
+                if (audioCaptureCtx.state === 'suspended') {
+                    await audioCaptureCtx.resume();
+                }
+                recordedSampleRate = audioCaptureCtx.sampleRate || 16000;
+
+                var source = audioCaptureCtx.createMediaStreamSource(activeMediaStream);
+                var analyser = audioCaptureCtx.createAnalyser();
+                analyser.fftSize = 512;
+                source.connect(analyser);
+
+                recordedPcmSamples = [];
+                audioProcessorNode = audioCaptureCtx.createScriptProcessor(4096, 1, 1);
+
+                audioProcessorNode.onaudioprocess = function(e) {
+                    if (isVoiceFinished) return;
+                    var channelData = e.inputBuffer.getChannelData(0);
+                    recordedPcmSamples.push(new Float32Array(channelData));
+                };
+
+                source.connect(audioProcessorNode);
+                audioProcessorNode.connect(audioCaptureCtx.destination);
+
+                var freqData = new Uint8Array(analyser.frequencyBinCount);
+                function monitorMicLevel() {
+                    if (isVoiceFinished || !audioCaptureCtx) return;
+                    analyser.getByteFrequencyData(freqData);
+                    var sum = 0;
+                    for (var i = 0; i < freqData.length; i++) sum += freqData[i];
+                    var avg = sum / freqData.length;
+                    var pct = Math.min(100, (avg / 65) * 100);
+                    if (pct > detectedVoicePeak) detectedVoicePeak = pct;
+                    setVoiceMeterLevel(pct);
+                    voiceMeterRaf = requestAnimationFrame(monitorMicLevel);
+                }
+                voiceMeterRaf = requestAnimationFrame(monitorMicLevel);
+
+                var liveEl = document.getElementById('voiceLiveTranscript');
+                var stopBtn = document.getElementById('btnStopAndTranscribe');
+                if (liveEl && !liveRecognizedSpeech.trim()) {
+                    liveEl.innerText = '🎙️ ¡Micrófono abierto! Hable ahora y toque «Listo, ya hablé».';
+                }
+                if (stopBtn) stopBtn.classList.remove('hidden');
+            } catch (err) {
+                activateVoiceFallback('No se pudo acceder al micrófono. Escriba lo que dijo o elija una opción:');
+            }
+        }
+
+        function encodeWavBase64(chunks, sampleRate) {
+            var totalLength = 0;
+            for (var i = 0; i < chunks.length; i++) totalLength += chunks[i].length;
+            if (totalLength === 0) return null;
+
+            var merged = new Float32Array(totalLength);
+            var offset = 0;
+            for (var j = 0; j < chunks.length; j++) {
+                merged.set(chunks[j], offset);
+                offset += chunks[j].length;
+            }
+
+            var buffer = new ArrayBuffer(44 + merged.length * 2);
+            var view = new DataView(buffer);
+
+            function writeStr(pos, str) {
+                for (var s = 0; s < str.length; s++) {
+                    view.setUint8(pos + s, str.charCodeAt(s));
+                }
+            }
+
+            writeStr(0, 'RIFF');
+            view.setUint32(4, 36 + merged.length * 2, true);
+            writeStr(8, 'WAVE');
+            writeStr(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeStr(36, 'data');
+            view.setUint32(40, merged.length * 2, true);
+
+            var idx = 44;
+            for (var k = 0; k < merged.length; k++) {
+                var sample = Math.max(-1, Math.min(1, merged[k]));
+                view.setInt16(idx, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                idx += 2;
+            }
+
+            var bytes = new Uint8Array(buffer);
+            var binary = '';
+            for (var b = 0; b < bytes.length; b++) {
+                binary += String.fromCharCode(bytes[b]);
+            }
+            return btoa(binary);
+        }
+
+        function cleanupAudioCapture() {
+            if (voiceMeterRaf) {
+                cancelAnimationFrame(voiceMeterRaf);
+                voiceMeterRaf = null;
+            }
+            if (audioProcessorNode) {
+                try {
+                    audioProcessorNode.disconnect();
+                    audioProcessorNode.onaudioprocess = null;
+                } catch (e) {}
+                audioProcessorNode = null;
+            }
+            if (audioCaptureCtx) {
+                try { audioCaptureCtx.close(); } catch (e) {}
+                audioCaptureCtx = null;
+            }
+            if (activeMediaStream) {
+                try {
+                    activeMediaStream.getTracks().forEach(function(t) { t.stop(); });
+                } catch (e) {}
+                activeMediaStream = null;
+            }
+        }
+
+        function activateVoiceFallback(reasonText) {
+            var box = document.getElementById('voiceFallbackBox');
+            var reasonEl = document.getElementById('voiceFallbackReason');
+            var chipsEl = document.getElementById('voiceQuickChips');
+            if (reasonEl && reasonText) {
+                reasonEl.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i>' + reasonText;
+            }
+            if (chipsEl) {
+                var suggestions = activeVoiceTargetId === 'medName'
+                    ? ['Mañana a las 8 de la mañana paracetamol y losartán', 'Hoy a las 9 de la noche vitamina c', 'El viernes a las 13:30 ibuprofeno']
+                    : ['Necesito comprar pan, leche y manzanas', 'Pan y leche', 'Arroz, aceite y fideos'];
+                chipsEl.innerHTML = suggestions.map(function(s) {
+                    return '<button type="button" onclick="applyQuickVoiceSuggestion(\'' + s.replace(/'/g, "\\'") + '\')" class="px-2.5 py-1 bg-white hover:bg-amber-100 border border-amber-300 rounded-xl text-xs font-bold text-slate-800 transition">' + s + '</button>';
+                }).join('');
+            }
+            if (box) box.classList.remove('hidden');
+        }
+
+        function applyQuickVoiceSuggestion(phrase) {
+            isVoiceFinished = true;
+            hasAutoSubmittedSpeech = true;
+            setVoiceProcessingSignal(true, 'Cargando...');
+            insertVoiceText(phrase).finally(function() {
+                setVoiceProcessingSignal(false);
+                stopVoiceRecognition();
+            });
+        }
+
+        function applyManualVoiceSim() {
+            var manualInp = document.getElementById('voiceManualSimInput');
+            var val = manualInp ? manualInp.value.trim() : '';
+            if (!val) {
+                showToast('Escriba lo que dijo antes de usar.');
+                return;
+            }
+            isVoiceFinished = true;
+            hasAutoSubmittedSpeech = true;
+            setVoiceProcessingSignal(true, 'Cargando...');
+            insertVoiceText(val).finally(function() {
+                setVoiceProcessingSignal(false);
+                stopVoiceRecognition();
+            });
+        }
+
+        function finishAudioRecording() {
+            if (isVoiceFinished) return;
+            isVoiceFinished = true;
+            clearActiveRecognitionInstance();
+
+            var liveEl = document.getElementById('voiceLiveTranscript');
+            var stopBtn = document.getElementById('btnStopAndTranscribe');
+            var candidateText = (liveRecognizedSpeech || '').trim();
+            var wavBase64 = encodeWavBase64(recordedPcmSamples, recordedSampleRate);
+            cleanupAudioCapture();
+            recordedPcmSamples = [];
+
+            if (candidateText) {
+                hasAutoSubmittedSpeech = true;
+                setVoiceProcessingSignal(true, 'Cargando...');
+                if (stopBtn) stopBtn.classList.add('hidden');
+                if (liveEl) {
+                    liveEl.className = 'text-lg text-slate-900 font-extrabold not-italic min-h-[24px]';
+                    liveEl.innerText = '«' + candidateText + '»';
+                }
+                insertVoiceText(candidateText).then(function() {
+                    setVoiceProcessingSignal(false);
+                    stopVoiceRecognition();
+                });
+                return;
+            }
+
+            if (wavBase64) {
+                setVoiceProcessingSignal(true, 'Cargando...');
+                if (stopBtn) stopBtn.classList.add('hidden');
+                transcribeAudioWithGemini(wavBase64).then(function(spokenText) {
+                    if (spokenText && spokenText.trim()) {
+                        hasAutoSubmittedSpeech = true;
+                        return insertVoiceText(spokenText.trim()).then(function() {
+                            setVoiceProcessingSignal(false);
+                            stopVoiceRecognition();
+                        });
+                    } else {
+                        setVoiceProcessingSignal(false);
+                        if (liveEl) {
+                            liveEl.className = 'text-base text-emerald-700 font-bold italic min-h-[24px]';
+                            liveEl.innerText = 'Escriba o elija una frase rápida para completar:';
+                        }
+                        activateVoiceFallback('Si no se transcribió automáticamente, escriba lo que dijo o elija una opción:');
+                    }
+                });
+                return;
+            }
+
+            setVoiceProcessingSignal(false);
+            if (stopBtn) stopBtn.classList.add('hidden');
+            if (liveEl) {
+                liveEl.className = 'text-base text-emerald-700 font-bold italic min-h-[24px]';
+                liveEl.innerText = 'Escriba o elija una frase rápida para completar:';
+            }
+            activateVoiceFallback('Escriba lo que dijo o elija una frase rápida:');
+        }
+
+        async function callGeminiWithBackoff(payload, maxRetries) {
+            var retries = typeof maxRetries === 'number' ? maxRetries : 1;
+            var apiKey = '';
+            var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=' + encodeURIComponent(apiKey);
+            for (var attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    var res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) {
+                        if (attempt < retries && (res.status === 429 || res.status >= 500)) {
+                            await new Promise(function(r) { setTimeout(r, 350 * (attempt + 1)); });
+                            continue;
+                        }
+                        return null;
+                    }
+                    return await res.json();
+                } catch (e) {
+                    if (attempt < retries) {
+                        await new Promise(function(r) { setTimeout(r, 350 * (attempt + 1)); });
+                        continue;
+                    }
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        async function transcribeAudioWithGemini(wavBase64) {
+            if (!wavBase64) return '';
+            var payload = {
+                contents: [{
+                    role: 'user',
+                    parts: [
+                        { inlineData: { mimeType: 'audio/wav', data: wavBase64 } },
+                        { text: 'Transcribe exactamente lo que dice la persona en español, respetando conectores, pausas y habla natural. Devuelve solo la transcripción limpia sin comillas ni explicaciones.' }
+                    ]
+                }]
+            };
+            var data = await callGeminiWithBackoff(payload, 1);
+            var text = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+            return text ? text.trim() : '';
+        }
+
+        function parseExplicitTimeFromText(rawText) {
+            var norm = normalizeText(rawText);
+            var colonMatch = norm.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
+            if (colonMatch) {
+                return pad(parseInt(colonMatch[1], 10)) + ':' + pad(parseInt(colonMatch[2], 10));
+            }
+
+            var spokenMatch = norm.match(/\ba\s+las\s+([01]?\d|2[0-3])(?:\s*(?:con|:|\s+y\s+)?\s*(media|cuarto|([0-5]\d)))?\s*(?:de\s+la\s+(manana|tarde|noche)|am|pm)?\b/);
+            if (spokenMatch) {
+                var hour = parseInt(spokenMatch[1], 10);
+                var minPart = spokenMatch[2];
+                var minute = 0;
+                if (minPart === 'media') minute = 30;
+                else if (minPart === 'cuarto') minute = 15;
+                else if (spokenMatch[3]) minute = parseInt(spokenMatch[3], 10);
+
+                var period = spokenMatch[4] || '';
+                if ((period === 'tarde' || period === 'noche' || /\bpm\b/.test(norm)) && hour < 12) {
+                    hour += 12;
+                } else if ((period === 'manana' || /\bam\b/.test(norm)) && hour === 12) {
+                    hour = 0;
+                }
+                if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+                    return pad(hour) + ':' + pad(minute);
+                }
+            }
+            return null;
+        }
+
+        function parseExplicitDateFromText(rawText) {
+            var norm = normalizeText(rawText);
+            var base = new Date();
+            var target = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+
+            if (/\b(pasado\s+manana)\b/.test(norm)) {
+                target.setDate(target.getDate() + 2);
+                return toDateInputValue(target);
+            }
+            if (/\b(manana|para\s+manana|dia\s+siguiente)\b/.test(norm)) {
+                target.setDate(target.getDate() + 1);
+                return toDateInputValue(target);
+            }
+            if (/\b(hoy|para\s+hoy)\b/.test(norm)) {
+                return toDateInputValue(target);
+            }
+
+            var weekdays = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+            var wkMatch = norm.match(/\b(?:el\s+|para\s+el\s+|este\s+|proximo\s+)?(domingo|lunes|martes|miercoles|jueves|viernes|sabado)\b/);
+            if (wkMatch) {
+                var targetDow = weekdays.indexOf(wkMatch[1]);
+                if (targetDow !== -1) {
+                    var currentDow = target.getDay();
+                    var delta = (targetDow - currentDow + 7) % 7;
+                    if (delta === 0) delta = 7;
+                    target.setDate(target.getDate() + delta);
+                    return toDateInputValue(target);
+                }
+            }
+
+            var slashMatch = norm.match(/\b([0-2]?\d|3[01])[\/\-](0?\d|1[0-2])(?:[\/\-](\d{2,4}))?\b/);
+            if (slashMatch) {
+                var day = parseInt(slashMatch[1], 10);
+                var monthIdx = parseInt(slashMatch[2], 10) - 1;
+                var year = slashMatch[3] ? parseInt(slashMatch[3], 10) : base.getFullYear();
+                if (year < 100) year += 2000;
+                var candidate = new Date(year, monthIdx, day);
+                if (candidate.getMonth() === monthIdx && candidate.getDate() === day) {
+                    return toDateInputValue(candidate);
+                }
+            }
+
+            var months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            var namedMonthMatch = norm.match(/\b([0-2]?\d|3[01])\s+de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)(?:\s+de\s+(\d{4}))?\b/);
+            if (namedMonthMatch) {
+                var dNum = parseInt(namedMonthMatch[1], 10);
+                var mIdx = months.indexOf(namedMonthMatch[2]);
+                var yNum = namedMonthMatch[3] ? parseInt(namedMonthMatch[3], 10) : base.getFullYear();
+                var namedDate = new Date(yNum, mIdx, dNum);
+                if (namedDate.getMonth() === mIdx && namedDate.getDate() === dNum) {
+                    return toDateInputValue(namedDate);
+                }
+            }
+
+            return null;
+        }
+
+        function fallbackParseConversationalInput(rawText, currentKind) {
+            var norm = normalizeText(rawText);
+            var inferredKind = currentKind;
+
+            if (/\b(lista de compras|supermercado|comprar|alimentos|verduras|frutas|abarrotes|panaderia|lacteos)\b/.test(norm)) {
+                inferredKind = 'shop';
+            } else if (/\b(remedio|remedios|medicamento|medicamentos|tomarme|tomar|pastilla|pastillas|dosis|receta)\b/.test(norm)) {
+                inferredKind = 'med';
+            } else if (looksLikeMedication(rawText)) {
+                inferredKind = 'med';
+            } else if (detectShoppingSection(rawText)) {
+                inferredKind = 'shop';
+            }
+
+            var explicitDate = parseExplicitDateFromText(rawText);
+            var inferredDay = /\b(manana|para manana|dia siguiente|pasado manana)\b/.test(norm) ? 'manana' : 'hoy';
+            if (explicitDate) {
+                var todayVal = toDateInputValue(new Date());
+                var tomDate = new Date();
+                tomDate.setDate(tomDate.getDate() + 1);
+                var tomVal = toDateInputValue(tomDate);
+                if (explicitDate === todayVal) inferredDay = 'hoy';
+                else if (explicitDate === tomVal) inferredDay = 'manana';
+                else inferredDay = explicitDate;
+            }
+
+            var explicitTime = parseExplicitTimeFromText(rawText);
+            var inferredAnchor = 'desayuno';
+            if (/\b(almuerzo|mediodia)\b/.test(norm)) inferredAnchor = 'almuerzo';
+            else if (/\b(once|tarde)\b/.test(norm)) inferredAnchor = 'once';
+            else if (/\b(dormir|noche)\b/.test(norm)) inferredAnchor = 'dormir';
+            else if (explicitTime) {
+                var hParsed = parseInt(explicitTime.split(':')[0], 10);
+                if (hParsed < 11) inferredAnchor = 'desayuno';
+                else if (hParsed < 16) inferredAnchor = 'almuerzo';
+                else if (hParsed < 20) inferredAnchor = 'once';
+                else inferredAnchor = 'dormir';
+            }
+
+            var stripped = rawText
+                .replace(/^(?:necesito\s+(?:agregar|anotar|poner|comprar)|agrega(?:r)?|anota(?:r)?|pon(?:er)?|quiero\s+(?:agregar|comprar)|para\s+(?:hoy|mañana|manana)|debo\s+tomarme|tengo\s+que\s+tomar(?:me)?|me\s+toca\s+tomar(?:me)?|oye|mira|a\s+ver)\s+/i, '')
+                .replace(/\b(?:a\s+mi\s+lista\s+de\s+compras|en\s+mi\s+lista\s+de\s+compras|a\s+la\s+lista\s+de\s+compras|a\s+mi\s+lista|de\s+remedios|de\s+medicamentos|para\s+hoy|para\s+mañana|para\s+manana|pasado\s+mañana|pasado\s+manana|mañana|manana|hoy|antes\s+del\s+desayuno|con\s+el\s+desayuno|antes\s+del\s+almuerzo|con\s+el\s+almuerzo|con\s+la\s+once|antes\s+de\s+dormir|a\s+las\s+[01]?\d(?::[0-5]\d)?(?:\s*(?:con|y\s+media|y\s+cuarto|[0-5]\d))?(?:\s*(?:de\s+la\s+(?:mañana|manana|tarde|noche)|am|pm))?)\b/gi, ' ')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+
+            var items = splitDictatedItems(stripped || rawText).map(function(it) {
+                return it.replace(/^(?:el|la|los|las|un|una|unos|unas|mi|mis)\s+/i, '').trim();
+            }).filter(Boolean);
+
+            return {
+                targetSection: inferredKind,
+                scheduleDay: inferredDay,
+                scheduledDate: explicitDate || resolveScheduleDayToDateStr(inferredDay),
+                scheduledTime: explicitTime || (ANCHORS[inferredAnchor] ? ANCHORS[inferredAnchor].time : '08:00'),
+                anchorKey: inferredAnchor,
+                items: items
+            };
+        }
+
+        async function parseConversationalWithGemini(rawText, currentKind) {
+            var fallback = fallbackParseConversationalInput(rawText, currentKind);
+            var todayIso = toDateInputValue(new Date());
+            var prompt = 'Hoy es ' + todayIso + ' (zona horaria local). Analiza esta frase hablada en español con habla conectada, conectores y entonación natural: "' + rawText + '". ' +
+                'Contexto actual de la vista: ' + (currentKind === 'med' ? 'Remedios' : 'Compras') + '. ' +
+                'Extrae: 1) targetSection ("med" para medicamentos/remedios, "shop" para compras/alimentos/supermercado), ' +
+                '2) scheduleDay ("hoy", "manana", o fecha YYYY-MM-DD si menciona otro día o fecha), ' +
+                '3) scheduledTime (hora en formato 24h HH:MM si menciona hora, o vacía si no menciona), ' +
+                '4) anchorKey ("desayuno", "almuerzo", "once" o "dormir"), ' +
+                '5) items: lista limpia de cada medicamento o producto individual sin palabras de relleno ni horas ni días.';
+
+            var payload = {
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: 'application/json',
+                    responseSchema: {
+                        type: 'OBJECT',
+                        properties: {
+                            targetSection: { type: 'STRING', enum: ['med', 'shop'] },
+                            scheduleDay: { type: 'STRING' },
+                            scheduledTime: { type: 'STRING' },
+                            anchorKey: { type: 'STRING', enum: ['desayuno', 'almuerzo', 'once', 'dormir'] },
+                            items: { type: 'ARRAY', items: { type: 'STRING' } }
+                        },
+                        required: ['targetSection', 'scheduleDay', 'scheduledTime', 'anchorKey', 'items']
+                    }
+                }
+            };
+
+            var resJson = await callGeminiWithBackoff(payload, 2);
+            var rawJsonText = resJson && resJson.candidates && resJson.candidates[0] && resJson.candidates[0].content && resJson.candidates[0].content.parts && resJson.candidates[0].content.parts[0] && resJson.candidates[0].content.parts[0].text;
+            if (!rawJsonText) return fallback;
+
+            try {
+                var parsed = JSON.parse(rawJsonText);
+                var cleanedItems = Array.isArray(parsed.items)
+                    ? parsed.items.map(function(x) { return String(x || '').trim(); }).filter(Boolean)
+                    : [];
+                if (!cleanedItems.length) return fallback;
+
+                var normalizedDay = fallback.scheduleDay;
+                var rawDay = String(parsed.scheduleDay || '').trim().toLowerCase();
+                if (rawDay === 'hoy' || rawDay === 'manana') {
+                    normalizedDay = rawDay;
+                } else if (/^\d{4}-\d{2}-\d{2}$/.test(rawDay)) {
+                    normalizedDay = rawDay;
+                }
+
+                var normalizedTime = fallback.scheduledTime;
+                var rawTime = String(parsed.scheduledTime || '').trim();
+                if (/^([01]?\d|2[0-3]):[0-5]\d$/.test(rawTime)) {
+                    var tp = rawTime.split(':');
+                    normalizedTime = pad(parseInt(tp[0], 10)) + ':' + pad(parseInt(tp[1], 10));
+                }
+
+                return {
+                    targetSection: parsed.targetSection === 'shop' ? 'shop' : (parsed.targetSection === 'med' ? 'med' : fallback.targetSection),
+                    scheduleDay: normalizedDay,
+                    scheduledDate: resolveScheduleDayToDateStr(normalizedDay),
+                    scheduledTime: normalizedTime,
+                    anchorKey: ANCHORS[parsed.anchorKey] ? parsed.anchorKey : fallback.anchorKey,
+                    items: cleanedItems
+                };
+            } catch (e) {
+                return fallback;
+            }
+        }
+
+        function splitDictatedItems(rawText) {
+            if (!rawText || !rawText.trim()) return [];
+            var normalized = rawText
+                .replace(/\r\n/g, '\n')
+                .replace(/[•·●▪]/g, '\n')
+                .replace(/\s+(?:y|e|además|tambien|también|luego|después|despues|o sea|osea)\s+/gi, '\n')
+                .replace(/[,;]+/g, '\n');
+
+            var lines = normalized.split('\n');
+            var items = [];
+            for (var i = 0; i < lines.length; i++) {
+                var cleaned = lines[i]
+                    .replace(/^(?:un|una|unos|unas|algo de|comprar|anotar|remedio|medicamento|tomarme|tomar)\s+/i, '')
+                    .replace(/[.]+$/g, '')
+                    .trim();
+                if (cleaned) {
+                    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+                    items.push(cleaned);
+                }
+            }
+            return items;
+        }
+
+        function refreshVoiceBatchCount(kind) {
+            var textareaId = kind === 'med' ? 'medVoiceBatchTextarea' : 'shopVoiceBatchTextarea';
+            var countId = kind === 'med' ? 'medVoiceBatchCount' : 'shopVoiceBatchCount';
+            var ta = document.getElementById(textareaId);
+            var badge = document.getElementById(countId);
+            if (!ta || !badge) return;
+            var list = ta.value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+            badge.textContent = list.length + (list.length === 1 ? ' detectado' : ' detectados');
+        }
+
+        function toDateInputValue(dateObj) {
+            return dateObj.getFullYear() + '-' + pad(dateObj.getMonth() + 1) + '-' + pad(dateObj.getDate());
+        }
+
+        function resolveScheduleDayToDateStr(scheduleDay) {
+            var d = new Date();
+            if (!scheduleDay || scheduleDay === 'hoy') {
+                return toDateInputValue(d);
+            }
+            if (scheduleDay === 'manana') {
+                d.setDate(d.getDate() + 1);
+                return toDateInputValue(d);
+            }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(scheduleDay)) {
+                return scheduleDay;
+            }
+            return toDateInputValue(d);
+        }
+
+        function syncMedDatePickerFromDay(dayKey) {
+            var picker = document.getElementById('medDatePicker');
+            if (!picker) return;
+            picker.value = resolveScheduleDayToDateStr(dayKey);
+        }
+
+        function onMedDatePickerChange() {
+            var picker = document.getElementById('medDatePicker');
+            if (!picker || !picker.value) return;
+            var todayVal = toDateInputValue(new Date());
+            var tomDate = new Date();
+            tomDate.setDate(tomDate.getDate() + 1);
+            var tomVal = toDateInputValue(tomDate);
+
+            if (picker.value === todayVal) {
+                selectManualMedDay('hoy');
+            } else if (picker.value === tomVal) {
+                selectManualMedDay('manana');
+            } else {
+                selectedManualMedDay = picker.value;
+                var btnHoy = document.getElementById('btnDayHoy');
+                var btnManana = document.getElementById('btnDayManana');
+                if (btnHoy) btnHoy.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-emerald-50 transition flex items-center justify-center gap-2';
+                if (btnManana) btnManana.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-amber-50 transition flex items-center justify-center gap-2';
+            }
+        }
+
+        function selectManualMedDay(dayKey) {
+            if (dayKey === 'manana') {
+                selectedManualMedDay = 'manana';
+            } else if (/^\d{4}-\d{2}-\d{2}$/.test(dayKey || '')) {
+                var todayVal = toDateInputValue(new Date());
+                var tomDate = new Date();
+                tomDate.setDate(tomDate.getDate() + 1);
+                if (dayKey === todayVal) selectedManualMedDay = 'hoy';
+                else if (dayKey === toDateInputValue(tomDate)) selectedManualMedDay = 'manana';
+                else selectedManualMedDay = dayKey;
+            } else {
+                selectedManualMedDay = 'hoy';
+            }
+
+            var btnHoy = document.getElementById('btnDayHoy');
+            var btnManana = document.getElementById('btnDayManana');
+            if (!btnHoy || !btnManana) return;
+
+            if (selectedManualMedDay === 'hoy') {
+                btnHoy.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-emerald-600 text-white border-2 border-emerald-700 shadow transition flex items-center justify-center gap-2';
+                btnManana.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-amber-50 transition flex items-center justify-center gap-2';
+            } else if (selectedManualMedDay === 'manana') {
+                btnManana.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-amber-500 text-slate-950 border-2 border-amber-600 shadow transition flex items-center justify-center gap-2';
+                btnHoy.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-emerald-50 transition flex items-center justify-center gap-2';
+            } else {
+                btnHoy.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-emerald-50 transition flex items-center justify-center gap-2';
+                btnManana.className = 'py-3.5 px-3 rounded-2xl text-base sm:text-lg font-extrabold bg-white text-slate-800 border-2 border-slate-300 hover:bg-amber-50 transition flex items-center justify-center gap-2';
+            }
+            syncMedDatePickerFromDay(selectedManualMedDay);
+        }
+
+        function getMedicationDayLabel(scheduleDay) {
+            var now = new Date();
+            var todayVal = toDateInputValue(now);
+            var tomDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            var tomVal = toDateInputValue(tomDate);
+
+            if (scheduleDay === 'manana' || scheduleDay === tomVal) {
+                return 'Mañana (' + tomDate.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' }) + ')';
+            }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(scheduleDay || '') && scheduleDay !== todayVal) {
+                var parts = scheduleDay.split('-');
+                var customDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                return customDate.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
+            }
+            return 'Hoy (' + now.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' }) + ')';
+        }
+
+        function closeVoiceBatchVerification(kind) {
+            var boxId = kind === 'med' ? 'medVoiceBatchBox' : 'shopVoiceBatchBox';
+            var box = document.getElementById(boxId);
+            if (box) box.classList.add('hidden');
+        }
+
+        function confirmBatchVoiceItems(kind) {
+            var textareaId = kind === 'med' ? 'medVoiceBatchTextarea' : 'shopVoiceBatchTextarea';
+            var ta = document.getElementById(textareaId);
+            if (!ta) return;
+
+            var items = ta.value.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
+            if (!items.length) {
+                showToast('Escriba o dicte al menos un elemento.');
+                return;
+            }
+
+            if (kind === 'med') {
+                var chosenDay = selectedManualMedDay || 'hoy';
+                var dayLabel = getMedicationDayLabel(chosenDay);
+                var key = document.getElementById('medAnchor').value;
+                var time = document.getElementById('medTime').value || '08:00';
+                var baseAnchor = ANCHORS[key] ? ANCHORS[key].label : 'Hora personalizada';
+                var addedCount = 0;
+
+                items.forEach(function(itemName, idx) {
+                    if (detectShoppingSection(itemName)) return;
+                    meds.push({
+                        id: Date.now() + idx,
+                        name: itemName,
+                        anchor: baseAnchor + ' · ' + time + ' hrs',
+                        time: time,
+                        scheduleDay: chosenDay,
+                        takenAt: null,
+                        hiddenAfterTaken: false,
+                        addedBy: 'Carmen'
+                    });
+                    addedCount++;
+                });
+
+                saveMeds();
+                renderMeds();
+                updateDaughterDashboard();
+                closeVoiceBatchVerification('med');
+                ta.value = '';
+                showToast(addedCount + ' remedios agregados para ' + dayLabel.toLowerCase() + ' a las ' + time);
+            } else {
+                var secSel = document.getElementById('newSection');
+                var addedShop = 0;
+
+                items.forEach(function(itemName, idx) {
+                    if (looksLikeMedication(itemName)) return;
+                    var detectedCat = detectShoppingSection(itemName) || (secSel ? secSel.value : 'Abarrotes');
+                    shopItems.push({
+                        id: Date.now() + idx,
+                        name: itemName,
+                        section: detectedCat,
+                        inCart: false,
+                        addedBy: 'Carmen'
+                    });
+                    addedShop++;
+                });
+
+                saveShop();
+                renderShop();
+                updateDaughterDashboard();
+                closeVoiceBatchVerification('shop');
+                ta.value = '';
+                showToast(addedShop + ' productos agregados a Compras');
+            }
+        }
+
+        function retryBatchVoiceItems(kind) {
+            closeVoiceBatchVerification(kind);
+            if (kind === 'med') {
+                startVoiceInput('medName', 'Dicte su remedio, hora o día');
+            } else {
+                startVoiceInput('newItem', 'Dicte los alimentos o productos que desea comprar');
+            }
+        }
+
+        async function insertVoiceText(text) {
+            if (!activeVoiceTargetId) return;
+            var el = document.getElementById(activeVoiceTargetId);
+            if (!el) return;
+
+            if (activeVoiceTargetId === 'medName') {
+                el.value = text;
+                if (checkWrongSectionInMeds()) {
+                    showToast('Parece un producto de Compras. Revise el aviso en pantalla.');
+                    return;
+                }
+            } else if (activeVoiceTargetId === 'newItem') {
+                el.value = text;
+                if (onShopItemInputChange(true)) {
+                    showToast('Parece un medicamento. Revise el aviso en pantalla.');
+                    return;
+                }
+            }
+
+            if (activeVoiceTargetId === 'medName') {
+                var parsedMed = await parseConversationalWithGemini(text, 'med');
+                if (parsedMed.targetSection === 'shop' && checkWrongSectionInMeds()) {
+                    showToast('Parece un producto de Compras. Revise el aviso en pantalla.');
+                    return;
+                }
+
+                selectManualMedDay(parsedMed.scheduleDay || 'hoy');
+                var anchorSel = document.getElementById('medAnchor');
+                var timeInp = document.getElementById('medTime');
+                if (anchorSel && parsedMed.anchorKey && ANCHORS[parsedMed.anchorKey]) {
+                    anchorSel.value = parsedMed.anchorKey;
+                    onAnchorChange();
+                }
+                if (timeInp && parsedMed.scheduledTime) {
+                    timeInp.value = parsedMed.scheduledTime;
+                }
+                syncMedDatePickerFromDay(parsedMed.scheduleDay || 'hoy');
+
+                var hasMultipleMed = parsedMed.items.length > 1 || /[,;\n]|\b(y|e|además|tambien|también|luego|después|despues)\b/i.test(text);
+                if (hasMultipleMed) {
+                    var boxMed = document.getElementById('medVoiceBatchBox');
+                    var taMed = document.getElementById('medVoiceBatchTextarea');
+                    if (taMed && boxMed) {
+                        taMed.value = parsedMed.items.join('\n');
+                        refreshVoiceBatchCount('med');
+                        boxMed.classList.remove('hidden');
+                        el.value = parsedMed.items.join(', ');
+                        showToast('Detectado para ' + getMedicationDayLabel(parsedMed.scheduleDay) + ' a las ' + parsedMed.scheduledTime + '. Revise y confirme.');
+                        return;
+                    }
+                }
+
+                el.value = parsedMed.items.length ? parsedMed.items[0] : text;
+                checkWrongSectionInMeds();
+                showToast('Detectado: ' + el.value + ' · ' + getMedicationDayLabel(parsedMed.scheduleDay) + ' (' + parsedMed.scheduledTime + ')');
+                return;
+            }
+
+            if (activeVoiceTargetId === 'newItem') {
+                var parsedShop = await parseConversationalWithGemini(text, 'shop');
+                if (parsedShop.targetSection === 'med' && onShopItemInputChange(false)) {
+                    showToast('Parece un medicamento. Revise el aviso en pantalla.');
+                    return;
+                }
+
+                var hasMultipleShop = parsedShop.items.length > 1 || /[,;\n]|\b(y|e|además|tambien|también|luego|después|despues|necesito|agregar|anotar|comprar|lista de compras)\b/i.test(text);
+                if (hasMultipleShop) {
+                    var boxShop = document.getElementById('shopVoiceBatchBox');
+                    var taShop = document.getElementById('shopVoiceBatchTextarea');
+                    if (taShop && boxShop) {
+                        taShop.value = parsedShop.items.join('\n');
+                        refreshVoiceBatchCount('shop');
+                        boxShop.classList.remove('hidden');
+                        el.value = parsedShop.items.join(', ');
+                        showToast('Lista de compras interpretada. Revise y confirme.');
+                        return;
+                    }
+                }
+
+                el.value = parsedShop.items.length ? parsedShop.items[0] : text;
+                onShopItemInputChange(true);
+                showToast('Producto dictado: ' + el.value);
+                return;
+            }
+
+            if (el.tagName === 'TEXTAREA') {
+                el.value = el.value ? (el.value.trim() + ' ' + text) : text;
+            } else {
+                el.value = text;
+            }
+            showToast('Texto dictado agregado: ' + text);
+        }
+
+        function stopVoiceRecognition() {
+            isVoiceFinished = true;
+            clearActiveRecognitionInstance();
+            setVoiceProcessingSignal(false);
+            cleanupAudioCapture();
+            recordedPcmSamples = [];
+            var modal = document.getElementById('voiceModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // --- NOTAS COMPARTIDAS Y SINCRONIZACIÓN CON BITÁCORA MÓVIL ---
+        var NOTES_KEY = 'fonovibe_notes_carmen_clean_v1';
+        var MOBILE_BITACORA_NOTES_KEY = 'fonovibe_simple_notes_v1';
+        var mobileBitacoraNotes = [];
+
+        function loadMobileBitacoraNotes() {
+            try {
+                var raw = localStorage.getItem(MOBILE_BITACORA_NOTES_KEY);
+                if (!raw) {
+                    mobileBitacoraNotes = [];
+                    return;
+                }
+                var parsed = JSON.parse(raw);
+                mobileBitacoraNotes = Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                mobileBitacoraNotes = [];
+            }
+        }
+
+        function deleteMobileBitacoraNote(noteId) {
+            mobileBitacoraNotes = mobileBitacoraNotes.filter(function(n) {
+                return String(n.id) !== String(noteId);
+            });
+            try {
+                localStorage.setItem(MOBILE_BITACORA_NOTES_KEY, JSON.stringify(mobileBitacoraNotes));
+            } catch (e) {}
+            renderSharedNotes();
+            updateDaughterDashboard();
+            showToast('Nota de bitácora eliminada');
+        }
+
+        function escapeHtmlText(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function saveNotesToStorage() {
+            try { localStorage.setItem(NOTES_KEY, JSON.stringify(sharedNotes)); } catch (e) {}
+        }
+
+        function loadNotesFromStorage() {
+            var raw = null;
+            try { raw = localStorage.getItem(NOTES_KEY); } catch (e) {}
+            if (raw) {
+                try { sharedNotes = JSON.parse(raw) || []; return; } catch (e) {}
+            }
+            sharedNotes = [];
+        }
+
+        function deleteSharedNote(noteId) {
+            sharedNotes = sharedNotes.filter(function(n) { return String(n.id) !== String(noteId); });
+            saveNotesToStorage();
+            renderSharedNotes();
+            updateDaughterDashboard();
+            showToast('Nota eliminada del cuaderno compartido');
+        }
+
+        function renderSharedNotes() {
+            var listBitacora = document.getElementById('daughterBitacoraNotesList');
+            if (listBitacora) {
+                loadMobileBitacoraNotes();
+                if (!mobileBitacoraNotes.length) {
+                    listBitacora.innerHTML = '<li class="text-sm text-slate-500 italic py-2">No hay notas guardadas en la bitácora móvil.</li>';
+                } else {
+                    listBitacora.innerHTML = mobileBitacoraNotes.map(function(item) {
+                        var safeId = escapeHtmlText(item.id);
+                        var safeText = escapeHtmlText(item.text || item.summary || '');
+                        var safeTime = escapeHtmlText(item.createdAt || '');
+                        var srcLabel = item.source === 'voz' ? 'Voz' : 'Texto';
+                        var badgeCls = item.source === 'voz'
+                            ? 'bg-indigo-100 text-indigo-800'
+                            : 'bg-emerald-100 text-emerald-800';
+                        return '<li class="flex items-start justify-between gap-3 p-3 rounded-2xl border border-indigo-200 bg-indigo-50/50">' +
+                            '<div class="min-w-0">' +
+                                '<div class="flex items-center gap-2">' +
+                                    '<span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full ' + badgeCls + '">' + srcLabel + '</span>' +
+                                    (safeTime ? '<span class="text-xs font-bold text-slate-500">' + safeTime + '</span>' : '') +
+                                '</div>' +
+                                '<p class="text-sm sm:text-base font-bold text-slate-900 mt-1 break-words">' + safeText + '</p>' +
+                            '</div>' +
+                            '<button type="button" onclick="deleteMobileBitacoraNote(\'' + safeId + '\')" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl text-xs font-extrabold shrink-0 transition">' +
+                                '<i class="fa-solid fa-trash-can mr-1"></i>Eliminar' +
+                            '</button>' +
+                        '</li>';
+                    }).join('');
+                }
+            }
+        }
+
+        // --- FUNCIONES DE APORTE Y GESTIÓN DE LA HIJA ---
+        function daughterDeleteMed(medId) {
+            meds = meds.filter(function(m) { return String(m.id) !== String(medId); });
+            saveMeds();
+            renderMeds();
+            updateDaughterDashboard();
+            showToast('Remedio eliminado de la lista de Sra. Carmen');
+        }
+
+        function daughterDeleteShopItem(itemId) {
+            shopItems = shopItems.filter(function(i) { return String(i.id) !== String(itemId); });
+            saveShop();
+            renderShop();
+            updateDaughterDashboard();
+            showToast('Producto eliminado de la lista de Sra. Carmen');
+        }
+
+        function updateDaughterDashboard() {
+            var taken = meds.filter(function(m) { return m.takenAt; }).length;
+            var medSumEl = document.getElementById('daughterMedSummary');
+            if (medSumEl) medSumEl.innerText = taken + ' de ' + meds.length + ' remedios tomados hoy por Sra. Carmen.';
+
+            var inCart = shopItems.filter(function(i) { return i.inCart; }).length;
+            var shopSumEl = document.getElementById('daughterShopSummary');
+            if (shopSumEl) shopSumEl.innerText = inCart + ' de ' + shopItems.length + ' productos listos en la lista.';
+
+            var medsManageUl = document.getElementById('daughterMedsManageList');
+            if (medsManageUl) {
+                medsManageUl.innerHTML = meds.length ? meds.map(function(m) {
+                    var isCarmen = m.addedBy !== 'Hija';
+                    var dayLabel = getMedicationDayLabel(m.scheduleDay || 'hoy');
+                    return '<li class="flex items-center justify-between gap-2 p-3 rounded-2xl border-2 ' + (isCarmen ? 'bg-blue-50/60 border-blue-200' : 'bg-indigo-50/60 border-indigo-200') + '">' +
+                        '<div class="min-w-0">' +
+                            '<p class="text-base font-extrabold text-slate-900 truncate">' + escapeHtmlText(m.time) + ' · ' + escapeHtmlText(m.name) + '</p>' +
+                            '<div class="flex flex-wrap items-center gap-1.5 mt-1">' +
+                                '<span class="text-xs font-extrabold uppercase px-2 py-0.5 rounded-full ' + (isCarmen ? 'bg-blue-200 text-blue-950' : 'bg-indigo-600 text-white') + '">' + (isCarmen ? 'Anotado por Sra. Carmen' : 'Agregado por Hija') + '</span>' +
+                                '<span class="text-xs font-extrabold px-2 py-0.5 rounded-full ' + ((m.scheduleDay === 'manana') ? 'bg-amber-200 text-amber-950' : 'bg-emerald-100 text-emerald-900') + '">' + escapeHtmlText(dayLabel) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<button type="button" onclick="daughterDeleteMed(' + m.id + ')" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl text-xs font-extrabold shrink-0 transition"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>' +
+                    '</li>';
+                }).join('') : '<p class="text-sm text-slate-500 italic">No hay remedios registrados.</p>';
+            }
+
+            var shopManageUl = document.getElementById('daughterShopManageList');
+            if (shopManageUl) {
+                shopManageUl.innerHTML = shopItems.length ? shopItems.map(function(it) {
+                    var isCarmen = it.addedBy !== 'Hija';
+                    return '<li class="flex items-center justify-between gap-2 p-3 rounded-2xl border-2 ' + (isCarmen ? 'bg-emerald-50/60 border-emerald-200' : 'bg-indigo-50/60 border-indigo-200') + '">' +
+                        '<div class="min-w-0">' +
+                            '<p class="text-base font-extrabold text-slate-900 truncate">' + escapeHtmlText(it.name) + '</p>' +
+                            '<span class="text-xs font-extrabold uppercase px-2 py-0.5 rounded-full ' + (isCarmen ? 'bg-emerald-200 text-emerald-950' : 'bg-indigo-600 text-white') + '">' + (isCarmen ? 'Anotado por Sra. Carmen' : 'Agregado por Hija') + '</span>' +
+                        '</div>' +
+                        '<button type="button" onclick="daughterDeleteShopItem(' + it.id + ')" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl text-xs font-extrabold shrink-0 transition"><i class="fa-solid fa-trash-can mr-1"></i>Eliminar</button>' +
+                    '</li>';
+                }).join('') : '<p class="text-sm text-slate-500 italic">No hay productos en la lista.</p>';
+            }
+
+            renderSharedNotes();
+        }
+
+        function daughterAddShopItem() {
+            var inp = document.getElementById('daughterShopInput');
+            var val = inp ? inp.value.trim() : '';
+            if (!val) return;
+            var detectedCat = detectShoppingSection(val) || 'Abarrotes';
+            shopItems.push({ id: Date.now(), name: val, section: detectedCat, inCart: false, addedBy: 'Hija' });
+            inp.value = '';
+            saveShop();
+            renderShop();
+            updateDaughterDashboard();
+            showToast('Producto añadido a la lista de Sra. Carmen');
+        }
+
+        function daughterAddMed() {
+            var inp = document.getElementById('daughterMedInput');
+            var timeInp = document.getElementById('daughterMedTime');
+            var val = inp ? inp.value.trim() : '';
+            var t = (timeInp && timeInp.value) ? timeInp.value : '18:00';
+            if (!val) return;
+            var dayTitle = getMedicationDayLabel('hoy');
+            meds.push({
+                id: Date.now(),
+                name: val,
+                anchor: 'Agregado por su hija (' + dayTitle + ')',
+                time: t,
+                scheduleDay: 'hoy',
+                takenAt: null,
+                hiddenAfterTaken: false,
+                addedBy: 'Hija'
+            });
+            inp.value = '';
+            saveMeds();
+            renderMeds();
+            updateDaughterDashboard();
+            showToast('Remedio añadido para ' + dayTitle.toLowerCase());
+        }
+
+        // --- TOAST ---
+        var toastTimer;
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-28', 'opacity-0');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() {
+                toast.classList.add('translate-y-28', 'opacity-0');
+            }, 3500);
+        }
+
+        // --- LÓGICA MEDICAMENTOS ---
+        var MED_KEY = 'fonovibe_meds_carmen_clean_v1';
+        var ANCHORS = {
+            desayuno: { label: 'Con el desayuno', time: '08:00' },
+            almuerzo: { label: 'Con el almuerzo', time: '13:00' },
+            once: { label: 'Con la once', time: '18:00' },
+            dormir: { label: 'Antes de dormir', time: '21:30' }
+        };
+        var meds = [];
+
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
+        function todayStr() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+        function toMin(hhmm) { var p = hhmm.split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+        function currentHHMM() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+        function nowMin() { return toMin(currentHHMM()); }
+
+        function saveMeds() { try { localStorage.setItem(MED_KEY, JSON.stringify({ date: todayStr(), meds: meds })); } catch (e) {} }
+        function loadMeds() {
+            var raw = null;
+            try { raw = localStorage.getItem(MED_KEY); } catch (e) {}
+            if (raw) {
+                try {
+                    var data = JSON.parse(raw);
+                    meds = data.meds || [];
+                    if (data.date !== todayStr()) {
+                        meds.forEach(function (m) { m.takenAt = null; m.hiddenAfterTaken = false; });
+                    }
+                    return;
+                } catch (e) {}
+            }
+            meds = [];
+        }
+
+        function fmtDur(min) {
+            var absMin = Math.abs(min);
+            var h = Math.floor(absMin / 60);
+            var m = absMin % 60;
+            return (h ? h + ' h ' : '') + m + ' min';
+        }
+
+        // --- DETECCIÓN DE SECCIÓN EQUIVOCADA Y CATEGORÍA DE COMPRAS ---
+        var MED_KEYWORDS = ['paracetamol', 'ibuprofeno', 'losartan', 'losartán', 'levotiroxina', 'omeprazol', 'atorvastatina', 'metformina', 'aspirina', 'vitamina', 'calcio', 'pastilla', 'pastillas', 'remedio', 'remedios', 'medicamento', 'medicamentos', 'jarabe', 'gotas', 'insulina', 'clonazepam', 'amlodipino', 'enalapril', 'mg'];
+
+        var SHOP_CATEGORY_MAP = {
+            'Frutas y verduras': ['manzana', 'manzanas', 'platano', 'plátano', 'banana', 'naranja', 'naranjas', 'tomate', 'tomates', 'lechuga', 'zanahoria', 'palta', 'paltas', 'limon', 'limón', 'cebolla', 'ajo', 'pera', 'peras', 'uva', 'uvas', 'fruta', 'frutas', 'verdura', 'verduras', 'papa', 'papas', 'zapallo', 'choclo'],
+            'Panadería': ['pan', 'hallulla', 'hallullas', 'marraqueta', 'marraquetas', 'bolillo', 'molde', 'galleta', 'galletas', 'queque', 'kuchen', 'masa', 'empanada', 'empanadas'],
+            'Carnes y pescados': ['carne', 'pollo', 'pechuga', 'trutro', 'pescado', 'salmon', 'salmón', 'merluza', 'atun', 'atún', 'cerdo', 'vacuno', 'lomo', 'pavo', 'longaniza', 'chorizo', 'hamburguesa'],
+            'Lácteos y refrigerados': ['leche', 'yogur', 'yogurt', 'queso', 'quesillo', 'mantequilla', 'margarina', 'crema', 'huevo', 'huevos', 'jamon', 'jamón'],
+            'Abarrotes': ['cafe', 'café', 'te', 'té', 'azucar', 'azúcar', 'arroz', 'fideos', 'tallarines', 'aceite', 'sal', 'harina', 'avena', 'legumbres', 'porotos', 'lentejas', 'garbanzos', 'salsa', 'conserva', 'miel', 'mermelada'],
+            'Limpieza y aseo': ['jabon', 'jabón', 'shampoo', 'champu', 'champú', 'cloro', 'lavaloza', 'lavalozas', 'detergente', 'esponja', 'papel higienico', 'papel higiénico', 'confort', 'servilleta', 'servilletas', 'pasta dental', 'cepillo']
+        };
+
+        function normalizeText(str) {
+            return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        }
+
+        function looksLikeMedication(text) {
+            var norm = normalizeText(text);
+            if (!norm) return false;
+            return MED_KEYWORDS.some(function(kw) {
+                var cleanKw = normalizeText(kw);
+                var regex = new RegExp('(^|\\b|\\s)' + cleanKw + '(\\b|\\s|$)', 'i');
+                return regex.test(norm);
+            });
+        }
+
+        function detectShoppingSection(text) {
+            var norm = normalizeText(text);
+            if (!norm) return null;
+            var categories = Object.keys(SHOP_CATEGORY_MAP);
+            for (var i = 0; i < categories.length; i++) {
+                var cat = categories[i];
+                var words = SHOP_CATEGORY_MAP[cat];
+                for (var j = 0; j < words.length; j++) {
+                    var w = normalizeText(words[j]);
+                    var regex = new RegExp('(^|\\b|\\s)' + w + '(\\b|\\s|$)', 'i');
+                    if (regex.test(norm)) {
+                        return cat;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function onAnchorChange() {
+            var k = document.getElementById('medAnchor').value;
+            if (ANCHORS[k]) document.getElementById('medTime').value = ANCHORS[k].time;
+        }
+
+        function closeWrongSectionModals() {
+            var medAlert = document.getElementById('medWrongSectionAlert');
+            var shopAlert = document.getElementById('shopWrongSectionAlert');
+            if (medAlert) medAlert.classList.add('hidden');
+            if (shopAlert) shopAlert.classList.add('hidden');
+        }
+
+        function checkWrongSectionInMeds() {
+            var nameInput = document.getElementById('medName');
+            var alertBox = document.getElementById('medWrongSectionAlert');
+            var msgEl = document.getElementById('medWrongSectionMsg');
+            if (!nameInput || !alertBox || !msgEl) return false;
+
+            var text = nameInput.value.trim();
+            var detectedShopCat = detectShoppingSection(text) || (!looksLikeMedication(text) && /\b(comprar|supermercado|lista de compras|alimentos|verduras|frutas|pan|leche|cafe|café|arroz|fideos|manzanas|peras)\b/i.test(normalizeText(text)) ? 'Supermercado' : null);
+
+            if (text && detectedShopCat) {
+                msgEl.textContent = '⚠️ Parece que "' + text + '" es un producto de supermercado (' + detectedShopCat + ') y está en la sección de Remedios.';
+                alertBox.classList.remove('hidden');
+                return true;
+            }
+
+            alertBox.classList.add('hidden');
+            return false;
+        }
+
+        function onShopItemInputChange(autoSelectCategory) {
+            var input = document.getElementById('newItem');
+            var secSel = document.getElementById('newSection');
+            var alertBox = document.getElementById('shopWrongSectionAlert');
+            var msgEl = document.getElementById('shopWrongSectionMsg');
+            var hintEl = document.getElementById('shopAutoCatHint');
+            if (!input) return false;
+
+            var text = input.value.trim();
+            if (!text) {
+                if (alertBox) alertBox.classList.add('hidden');
+                if (hintEl) hintEl.classList.add('hidden');
+                return false;
+            }
+
+            if (looksLikeMedication(text)) {
+                if (hintEl) hintEl.classList.add('hidden');
+                if (alertBox && msgEl) {
+                    msgEl.textContent = '⚠️ Parece que "' + text + '" es un medicamento y está en la sección de Compras.';
+                    alertBox.classList.remove('hidden');
+                }
+                return true;
+            }
+
+            if (alertBox) alertBox.classList.add('hidden');
+
+            var detectedCat = detectShoppingSection(text);
+            if (detectedCat) {
+                if (autoSelectCategory !== false && secSel) {
+                    secSel.value = detectedCat;
+                }
+                if (hintEl) {
+                    hintEl.textContent = '✓ Categoría detectada automáticamente: ' + detectedCat;
+                    hintEl.classList.remove('hidden');
+                }
+            } else if (hintEl) {
+                hintEl.classList.add('hidden');
+            }
+
+            return false;
+        }
+
+        function redirectFromMedToShop() {
+            var medInput = document.getElementById('medName');
+            var shopInput = document.getElementById('newItem');
+            var val = medInput ? medInput.value.trim() : '';
+            if (medInput) medInput.value = '';
+            closeWrongSectionModals();
+            selectSimpleTab('supermercado');
+            if (shopInput && val) {
+                shopInput.value = val;
+                onShopItemInputChange(true);
+            }
+        }
+
+        function redirectFromShopToMed() {
+            var shopInput = document.getElementById('newItem');
+            var medInput = document.getElementById('medName');
+            var val = shopInput ? shopInput.value.trim() : '';
+            if (shopInput) shopInput.value = '';
+            closeWrongSectionModals();
+            selectSimpleTab('medicamento');
+            if (medInput && val) {
+                medInput.value = val;
+            }
+        }
+
+        function addMed() {
+            var nameInput = document.getElementById('medName');
+            var timeInput = document.getElementById('medTime');
+            var anchorSel = document.getElementById('medAnchor');
+            var formMsg = document.getElementById('formMsg');
+
+            var name = nameInput && typeof nameInput.value === 'string' ? nameInput.value.trim() : '';
+            var time = timeInput && typeof timeInput.value === 'string' ? timeInput.value : '08:00';
+            var key = anchorSel && typeof anchorSel.value === 'string' ? anchorSel.value : 'desayuno';
+
+            if (!name || !time) {
+                if (formMsg) formMsg.textContent = 'Dicte o escriba el nombre del remedio.';
+                return;
+            }
+
+            if (checkWrongSectionInMeds()) {
+                if (formMsg) formMsg.textContent = 'Este texto parece ser de Compras. Use el botón de arriba para ir allá.';
+                return;
+            }
+
+            var chosenDay = selectedManualMedDay || 'hoy';
+            var dayLabel = getMedicationDayLabel(chosenDay);
+            var baseAnchor = ANCHORS[key] ? ANCHORS[key].label : 'Hora personalizada';
+
+            meds.push({
+                id: Date.now(),
+                name: name,
+                anchor: baseAnchor + ' · ' + time + ' hrs',
+                time: time,
+                scheduleDay: chosenDay,
+                takenAt: null,
+                hiddenAfterTaken: false,
+                addedBy: 'Carmen'
+            });
+            if (nameInput) nameInput.value = '';
+            if (formMsg) formMsg.textContent = '';
+            closeWrongSectionModals();
+            saveMeds();
+            renderMeds();
+            updateDaughterDashboard();
+            showToast('Remedio guardado para ' + dayLabel);
+        }
+
+        function takeMed(id) {
+            var m = meds.find(function (x) { return String(x.id) === String(id); });
+            if (!m || m.takenAt) return;
+            m.takenAt = currentHHMM();
+            m.takenTimestamp = Date.now();
+            saveMeds();
+            renderMeds();
+            updateDaughterDashboard();
+            showToast('¡Muy bien, Sra. Carmen! Se ocultará en 3 segundos');
+
+            setTimeout(function() {
+                var cardEl = document.getElementById('med-card-' + id);
+                if (cardEl) {
+                    cardEl.classList.add('med-fade-out');
+                }
+                setTimeout(function() {
+                    m.hiddenAfterTaken = true;
+                    saveMeds();
+                    renderMeds();
+                }, 700);
+            }, 2300);
+        }
+
+        function renderMeds() {
+            var now = nowMin();
+            var nowMs = Date.now();
+            var list = document.getElementById('medList');
+            if (!list) return;
+
+            meds.forEach(function(m) {
+                if (m.takenAt && !m.hiddenAfterTaken && m.takenTimestamp && (nowMs - m.takenTimestamp >= 3000)) {
+                    m.hiddenAfterTaken = true;
+                }
+            });
+
+            list.innerHTML = '';
+            var visibleMeds = meds.filter(function(m) { return !m.hiddenAfterTaken; });
+            var sorted = visibleMeds.slice().sort(function (a, b) { return toMin(a.time) - toMin(b.time); });
+            var upcoming = [];
+            var dueSoonList = [];
+            var lateList = [];
+
+            if (sorted.length === 0) {
+                list.innerHTML = '<li class="rounded-3xl border-2 border-dashed border-slate-300 bg-white p-6 text-center text-base sm:text-lg text-slate-600 font-semibold">No hay medicamentos pendientes en la lista.</li>';
+            }
+
+            sorted.forEach(function (m) {
+                var scheduleDay = m.scheduleDay || 'hoy';
+                var isForTomorrow = scheduleDay === 'manana';
+                var diff = toMin(m.time) - now;
+                var statusBadge = '';
+                var cardBorder = 'border-slate-300 bg-white';
+
+                if (m.takenAt) {
+                    cardBorder = 'border-emerald-400 bg-emerald-50';
+                    statusBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-extrabold bg-emerald-200 text-emerald-950"><i class="fa-solid fa-check-circle"></i> Tomado a las ' + escapeHtmlText(m.takenAt) + '</span>';
+                } else if (isForTomorrow) {
+                    cardBorder = 'border-amber-300 bg-amber-50/50';
+                    statusBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-extrabold bg-amber-200 text-amber-950"><i class="fa-solid fa-calendar-plus"></i> Programado para mañana</span>';
+                } else if (diff < -30) {
+                    lateList.push(m);
+                    cardBorder = 'border-red-500 bg-red-50';
+                    statusBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-extrabold bg-red-600 text-white animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Se atrasó (' + fmtDur(diff) + ' de retraso)</span>';
+                } else if (diff <= 0 && diff >= -30) {
+                    dueSoonList.push(m);
+                    cardBorder = 'border-amber-500 bg-amber-50 ring-2 ring-amber-300';
+                    statusBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-extrabold bg-amber-500 text-slate-950"><i class="fa-solid fa-clock"></i> ¡Se está atrasando! Tómeselo ahora</span>';
+                } else {
+                    upcoming.push(m);
+                    cardBorder = m.addedBy === 'Hija' ? 'border-indigo-400 bg-indigo-50/40' : 'border-blue-300 bg-white';
+                    statusBadge = '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-extrabold bg-blue-100 text-blue-900"><i class="fa-solid fa-hourglass-half"></i> Aún tiene tiempo (faltan ' + fmtDur(diff) + ')</span>';
+                }
+
+                var dayChip = '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold ' + (isForTomorrow ? 'bg-amber-100 text-amber-950 border border-amber-300' : 'bg-emerald-100 text-emerald-950 border border-emerald-300') + '"><i class="fa-regular fa-calendar"></i> ' + escapeHtmlText(getMedicationDayLabel(scheduleDay)) + '</span>';
+
+                var daughterTag = m.addedBy === 'Hija'
+                    ? '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-extrabold bg-indigo-600 text-white shadow-sm"><i class="fa-solid fa-heart"></i> Agregado por su hija</span>'
+                    : '';
+
+                var li = document.createElement('li');
+                li.id = 'med-card-' + m.id;
+                li.className = 'rounded-3xl border-2 p-5 shadow-sm transition-all duration-500 ' + cardBorder;
+                li.innerHTML = '<div class="flex flex-wrap items-start justify-between gap-2">' +
+                    '<div>' +
+                        '<div class="flex items-center flex-wrap gap-2">' +
+                            '<span class="text-3xl font-extrabold text-slate-900">' + escapeHtmlText(m.time) + '</span>' +
+                            dayChip +
+                            daughterTag +
+                        '</div>' +
+                        '<p class="text-xl font-bold text-slate-800 mt-1">' + escapeHtmlText(m.name) + '</p>' +
+                        '<p class="text-base sm:text-lg text-slate-700 font-semibold">' + escapeHtmlText(m.anchor) + '</p>' +
+                    '</div>' +
+                    '<div class="mt-1">' + statusBadge + '</div>' +
+                '</div>';
+
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                if (m.takenAt) {
+                    btn.className = 'mt-4 w-full py-3.5 text-lg font-bold rounded-2xl bg-emerald-200 text-emerald-950 cursor-default';
+                    btn.textContent = '✓ Ya registrado (ocultando en 3s...)';
+                } else {
+                    btn.className = 'mt-4 w-full py-4 text-xl font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition';
+                    btn.textContent = 'Marcar: Ya lo tomé';
+                    btn.onclick = function () { takeMed(m.id); };
+                }
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+
+            var text = document.getElementById('nextText');
+            var nextBox = document.getElementById('nextBox');
+            if (text && nextBox) {
+                if (meds.length === 0) {
+                    nextBox.className = 'rounded-3xl p-5 border-2 border-blue-300 bg-blue-50 shadow-sm text-center';
+                    text.textContent = 'Aún no hay medicamentos agregados hoy';
+                } else if (lateList.length) {
+                    nextBox.className = 'rounded-3xl p-5 border-2 border-red-500 bg-red-50 shadow-sm text-center';
+                    text.textContent = '⚠️ Atrasado: ' + lateList[0].name + ' (' + lateList[0].time + ')';
+                } else if (dueSoonList.length) {
+                    nextBox.className = 'rounded-3xl p-5 border-2 border-amber-500 bg-amber-50 shadow-sm text-center';
+                    text.textContent = '⏰ ¡Es hora! ' + dueSoonList[0].name + ' (' + dueSoonList[0].time + ')';
+                } else if (upcoming.length) {
+                    nextBox.className = 'rounded-3xl p-5 border-2 border-blue-400 bg-blue-50 shadow-sm text-center';
+                    text.textContent = 'Aún tiene tiempo · Próximo: ' + upcoming[0].name + ' a las ' + upcoming[0].time;
+                } else {
+                    nextBox.className = 'rounded-3xl p-5 border-2 border-emerald-400 bg-emerald-50 shadow-sm text-center';
+                    text.textContent = '¡Excelente! Todos los remedios de hoy están al día';
+                }
+            }
+            updateLiveClockDisplay();
+        }
+
+        // --- LÓGICA COMPRAS ---
+        var SHOP_KEY = 'fonovibe_compras_carmen_clean_v1';
+        var ROUTE = ['Frutas y verduras', 'Panadería', 'Carnes y pescados', 'Lácteos y refrigerados', 'Abarrotes', 'Limpieza y aseo'];
+        var shopItems = [];
+
+        function saveShop() { try { localStorage.setItem(SHOP_KEY, JSON.stringify(shopItems)); } catch (e) {} }
+        function loadShop() {
+            var raw = null;
+            try { raw = localStorage.getItem(SHOP_KEY); } catch (e) {}
+            if (raw) { try { shopItems = JSON.parse(raw) || []; return; } catch (e) {} }
+            shopItems = [];
+        }
+
+        function addItem() {
+            var input = document.getElementById('newItem');
+            var secSel = document.getElementById('newSection');
+            var name = input.value.trim();
+            if (!name) { document.getElementById('shopFormMsg').textContent = 'Dicte o escriba un producto.'; return; }
+
+            if (looksLikeMedication(name)) {
+                onShopItemInputChange(false);
+                document.getElementById('shopFormMsg').textContent = 'Esto parece un medicamento. Use el botón azul para ir a Remedios.';
+                return;
+            }
+
+            var detectedCat = detectShoppingSection(name);
+            var finalSection = detectedCat || secSel.value;
+            if (detectedCat && secSel) {
+                secSel.value = detectedCat;
+            }
+
+            shopItems.push({ id: Date.now(), name: name, section: finalSection, inCart: false, addedBy: 'Carmen' });
+            input.value = '';
+            document.getElementById('shopFormMsg').textContent = '';
+            document.getElementById('shopWrongSectionAlert').classList.add('hidden');
+            var hintEl = document.getElementById('shopAutoCatHint');
+            if (hintEl) hintEl.classList.add('hidden');
+            saveShop();
+            renderShop();
+            updateDaughterDashboard();
+            showToast('Agregado en ' + finalSection);
+        }
+
+        function toggleShopItem(id) {
+            var it = shopItems.find(function (x) { return String(x.id) === String(id); });
+            if (it) it.inCart = !it.inCart;
+            saveShop();
+            renderShop();
+            updateDaughterDashboard();
+        }
+
+        var DISTRACTED_PHRASES = [
+            'Salude con una sonrisa y diga: «Qué gusto verle, voy con mi lista de compras. ¡Nos vemos pronto!»',
+            'Respire tranquilo, despídase con amabilidad y vuelva a mirar su lista de compras.',
+            'Diga con calma: «Qué lindo conversar con usted, sigo avanzando con mis compras. ¡Que esté muy bien!»',
+            'Sonría, agradezca el saludo y retome el recorrido de su lista paso a paso.',
+            'No hay apuro: despídase con cariño y vuelva a su carro de compras.',
+            'Diga: «Me dio mucho gusto saludarle, voy a terminar mi lista. ¡Cuídese!»',
+            'Tome un segundo para respirar, despídase amablemente y siga con sus compras.',
+            'Recuerde que su lista le espera tranquila: despídase con una sonrisa y continúe.',
+            'Diga: «Qué agradable encontrarle, sigo con mi lista. ¡Hasta luego!»',
+            'Cierre la charla con cordialidad y vuelva a revisar lo que lleva en su carro.',
+            'Con una sonrisa amable, diga: «Seguimos conversando otro día, ahora voy con mis compras.»',
+            'Respire profundo, diga «¡Qué esté muy bien!» y vuelva a su lista.',
+            'Diga con calidez: «Qué bonito saludarle, voy a seguir con lo que me toca comprar.»',
+            'Despídase con tranquilidad y mire de nuevo su lista de compras.',
+            'Diga: «Muchas gracias por saludar, sigo con mi recorrido. ¡Que tenga buen día!»',
+            'Una sonrisa bastará para despedirse y volver a concentrarse en sus compras.',
+            'Diga: «Qué alegría verle, continúo con mi lista. ¡Nos vemos!»',
+            'Tome aire, despídase con respeto y vuelva a su próximo producto.',
+            'Diga: «Qué buena conversación, pero sigo con mis compras. ¡Un abrazo a la distancia!»',
+            'Vuelva a su ritmo tranquilo: despídase con amabilidad y siga con su lista.',
+            'Diga: «Me alegra mucho saludarle, voy a avanzar con mis compras. ¡Chao, que le vaya bien!»',
+            'Respire suavemente, diga «¡Hasta pronto!» y retome su lista.',
+            'Diga: «Qué gusto conversar un ratito, sigo con lo que vine a buscar.»',
+            'Con amabilidad, cierre la charla y vuelva a mirar su lista.',
+            'Diga: «Qué lindo verle por aquí, voy con mis compras. ¡Cuídese mucho!»',
+            'Respire tranquilo y diga: «Seguimos en contacto, ahora sigo con mi lista.»',
+            'Diga: «Qué amable de su parte saludar, voy a seguir con mi carro.»',
+            'Despídase con una sonrisa cálida y vuelva a su lista de compras.',
+            'Diga: «Me dio gusto verle, sigo con mis compras del día. ¡Que esté súper!»',
+            'Tome un respiro, despídase con cariño y continúe su recorrido.',
+            'Diga: «Qué bonito encontrarnos, voy a terminar de anotar y comprar. ¡Nos vemos!»',
+            'Con una sonrisa serena, diga «¡Que le vaya muy bien!» y vuelva a su lista.',
+            'Diga: «Qué agradable saludarle, sigo avanzando con mis compras.»',
+            'Despídase con tranquilidad y revise qué le falta en su lista.',
+            'Diga: «Muchas gracias, qué gusto verle. Sigo con mi lista de compras.»',
+            'Respire calmado, sonría y vuelva a su ruta de compras.',
+            'Diga: «Qué lindo conversar con usted, voy con lo mío. ¡Hasta luego!»',
+            'Cierre la conversación con dulzura y vuelva a mirar su lista.',
+            'Diga: «Qué alegría saludarle hoy, sigo con mis compras. ¡Cuídese!»',
+            'Tome aire, diga «¡Nos vemos pronto!» y retome su lista.',
+            'Diga: «Qué bueno verle bien, continúo con mis compras. ¡Que esté muy bien!»',
+            'Con una sonrisa amable, despídase y vuelva a su lista.',
+            'Diga: «Qué gusto encontrarle, voy a seguir con lo que necesito comprar.»',
+            'Respire profundo y diga: «Me despido por hoy, sigo con mi lista.»',
+            'Diga: «Qué lindo ratito de charla, voy a seguir con mi compra. ¡Chao!»',
+            'Vuelva con calma a su lista: despídase con una sonrisa.',
+            'Diga: «Qué amable saludar, sigo con mis compras. ¡Que tenga un lindo día!»',
+            'Tome un segundo, despídase con cariño y siga adelante con su lista.',
+            'Diga: «Me alegra verle, continúo con mi lista de compras. ¡Hasta pronto!»',
+            'Sonría con calma, diga «¡Que le vaya lindo!» y vuelva a su lista.',
+            'Diga: «Qué bonito conversar, voy con mis compras. ¡Cuídese mucho!»',
+            'Despídase con cordialidad y mire qué producto sigue en su lista.',
+            'Diga: «Qué gusto verle hoy, sigo avanzando con mis compras.»',
+            'Respire suave, sonría y retome el foco en su lista.',
+            'Diga: «Muchas gracias por la charla, voy a seguir con mi lista. ¡Nos vemos!»',
+            'Cierre el saludo con amabilidad y vuelva a su recorrido.',
+            'Diga: «Qué agradable verle, sigo con mis compras. ¡Que esté bien!»',
+            'Tome aire, diga «¡Hasta luego!» y vuelva a su lista.',
+            'Diga: «Qué lindo saludarle, voy a continuar con lo que me toca comprar.»',
+            'Con una sonrisa tranquila, despídase y siga con su lista.',
+            'Diga: «Qué alegría encontrarle, sigo con mi lista. ¡Que le vaya súper!»',
+            'Respire calmado, despídase con cariño y vuelva a su carro.',
+            'Diga: «Qué bueno conversar un momento, sigo con mis compras. ¡Cuídese!»',
+            'Vuelva suavemente a su lista: diga «¡Nos vemos!» y continúe.',
+            'Diga: «Qué gusto verle por aquí, voy con mis compras. ¡Que esté muy bien!»',
+            'Tome un respiro amable y retome su lista de compras.',
+            'Diga: «Qué bonito saludarle, sigo con mi lista del día. ¡Hasta pronto!»',
+            'Sonría con calidez, despídase y vuelva a mirar su lista.',
+            'Diga: «Muchas gracias por saludar, sigo con mis compras. ¡Chao!»',
+            'Despídase con calma y siga avanzando con su lista.',
+            'Diga: «Qué agradable encontrarnos, voy con mis compras. ¡Que le vaya muy bien!»',
+            'Respire profundo, sonría y vuelva a concentrarse en su lista.',
+            'Diga: «Qué lindo verle bien, sigo con mi lista. ¡Cuídese mucho!»',
+            'Cierre la conversación con amabilidad y retome su compra.',
+            'Diga: «Qué gusto conversar hoy, voy a seguir con mis compras. ¡Hasta luego!»',
+            'Tome aire con calma, diga «¡Que esté bien!» y vuelva a su lista.',
+            'Diga: «Qué alegría verle, continúo con mis compras. ¡Nos vemos pronto!»',
+            'Despídase con una sonrisa amable y siga con su lista.',
+            'Diga: «Qué bonito ratito, pero sigo con mis compras. ¡Que le vaya lindo!»',
+            'Respire suave y vuelva a mirar los productos de su lista.',
+            'Diga: «Muchas gracias por la conversación, sigo con mi lista. ¡Cuídese!»',
+            'Con calidez, despídase y vuelva a su ritmo de compras.',
+            'Diga: «Qué agradable saludarle hoy, voy con mis compras. ¡Chao!»',
+            'Tome un segundo, sonría y retome su lista de compras.',
+            'Diga: «Qué lindo verle por aquí, sigo con mis compras. ¡Hasta pronto!»',
+            'Despídase con tranquilidad y vuelva a su lista.',
+            'Diga: «Qué gusto encontrarle, sigo con mi lista de compras. ¡Que esté muy bien!»',
+            'Respire profundo, diga «¡Nos vemos!» y siga con su recorrido.',
+            'Diga: «Qué alegría conversar un poco, voy con mis compras. ¡Cuídese!»',
+            'Sonría con amabilidad y vuelva a su lista de compras.',
+            'Diga: «Qué bonito verle hoy, sigo avanzando con mi lista. ¡Que le vaya bien!»',
+            'Tome aire suave, despídase con cariño y retome su lista.',
+            'Diga: «Muchas gracias por saludar, voy a seguir con mis compras. ¡Hasta luego!»',
+            'Cierre la charla con calma y mire de nuevo su lista.',
+            'Diga: «Qué agradable verle bien, sigo con mis compras. ¡Chao, que esté muy bien!»',
+            'Respire tranquilo, sonría y siga con su lista de compras.',
+            'Diga: «Qué lindo conversar con usted, voy con mi lista. ¡Nos vemos!»',
+            'Despídase con cordialidad y vuelva a su próximo producto.',
+            'Diga: «Qué gusto verle, sigo con mis compras con toda calma. ¡Que le vaya muy bien!»'
+        ];
+        var distractedDeck = [];
+
+        function getNextDistractedPhrase() {
+            if (!distractedDeck.length) {
+                distractedDeck = DISTRACTED_PHRASES.slice();
+                for (var i = distractedDeck.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var tmp = distractedDeck[i];
+                    distractedDeck[i] = distractedDeck[j];
+                    distractedDeck[j] = tmp;
+                }
+            }
+            return distractedDeck.pop();
+        }
+
+        function distracted() {
+            var el = document.getElementById('refocus');
+            if (!el) return;
+            el.textContent = getNextDistractedPhrase();
+            el.classList.remove('hidden');
+        }
+
+        function renderShop() {
+            var list = document.getElementById('routeList');
+            if (!list) return;
+            list.innerHTML = '';
+            ROUTE.forEach(function (section) {
+                var inSection = shopItems.filter(function (it) { return it.section === section; });
+                if (!inSection.length) return;
+                var box = document.createElement('section');
+                box.className = 'bg-white rounded-3xl border-2 border-slate-200 p-5 shadow-sm space-y-3';
+                box.innerHTML = '<h3 class="text-lg font-extrabold text-emerald-900">' + escapeHtmlText(section) + '</h3>';
+                var ul = document.createElement('ul');
+                ul.className = 'space-y-2.5';
+                inSection.forEach(function (it) {
+                    var isFromDaughter = it.addedBy === 'Hija';
+                    var li = document.createElement('li');
+                    li.className = 'flex items-center justify-between gap-3 p-3.5 rounded-2xl border-2 ' + (it.inCart ? 'bg-slate-100 border-slate-300' : (isFromDaughter ? 'bg-indigo-50/70 border-indigo-400' : 'bg-white border-emerald-300'));
+
+                    var leftDiv = document.createElement('div');
+                    leftDiv.className = 'flex flex-col';
+                    var nameSpan = document.createElement('span');
+                    nameSpan.className = 'text-lg font-bold ' + (it.inCart ? 'line-through text-slate-500' : 'text-slate-900');
+                    nameSpan.textContent = it.name;
+                    leftDiv.appendChild(nameSpan);
+
+                    if (isFromDaughter) {
+                        var badge = document.createElement('span');
+                        badge.className = 'mt-1.5 inline-flex items-center gap-1 w-fit px-3 py-1 rounded-full text-sm font-extrabold bg-indigo-600 text-white';
+                        badge.innerHTML = '<i class="fa-solid fa-heart"></i> Agregado por su hija';
+                        leftDiv.appendChild(badge);
+                    }
+
+                    li.appendChild(leftDiv);
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = it.inCart ? 'px-4 py-2.5 text-base border-2 border-slate-400 rounded-xl font-bold bg-white shrink-0' : 'px-4 py-2.5 text-base sm:text-lg font-extrabold bg-emerald-600 text-white rounded-xl shadow shrink-0';
+                    btn.textContent = it.inCart ? 'Sacar' : '✓ En carro';
+                    btn.onclick = function () { toggleShopItem(it.id); };
+                    li.appendChild(btn);
+                    ul.appendChild(li);
+                });
+                box.appendChild(ul);
+                list.appendChild(box);
+            });
+
+            var total = shopItems.length;
+            var done = shopItems.filter(function (it) { return it.inCart; }).length;
+            document.getElementById('goalText').textContent = 'Lleva ' + done + ' de ' + total + ' productos en el carro';
+            document.getElementById('progressBar').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+        }
+
+        // Inicialización
+        (function init() {
+            var sel = document.getElementById('newSection');
+            if (sel) {
+                ROUTE.forEach(function (s) {
+                    var o = document.createElement('option');
+                    o.value = s;
+                    o.textContent = s;
+                    sel.appendChild(o);
+                });
+            }
+            loadMeds();
+            selectManualMedDay('hoy');
+            renderMeds();
+            loadShop();
+            renderShop();
+            loadMobileBitacoraNotes();
+            updateDaughterDashboard();
+            updateDynamicHeaderTitle();
+            updateGreetingBanner();
+            updateLiveClockDisplay();
+            fetchCurrentWeatherEmoji();
+            window.addEventListener('storage', function(ev) {
+                if (!ev || ev.key === MOBILE_BITACORA_NOTES_KEY) {
+                    loadMobileBitacoraNotes();
+                    renderSharedNotes();
+                    updateDaughterDashboard();
+                }
+            });
+            setInterval(updateLiveClockDisplay, 1000);
+            setInterval(function() { renderMeds(); updateGreetingBanner(); }, 15000);
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FonoVibe — Bitácora Móvil Simple</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Marco decorativo estilo Samsung Galaxy S26 Ultra */
+    .s26-shell {
+      box-shadow:
+        0 28px 70px -15px rgba(2, 6, 23, 0.7),
+        0 0 0 2px rgba(148, 163, 184, 0.35),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.14);
+    }
+
+    .s26-btn-vol-up {
+      position: absolute;
+      right: -5px;
+      top: 124px;
+      width: 4px;
+      height: 44px;
+      border-radius: 0 4px 4px 0;
+      background: linear-gradient(180deg, #64748b, #334155);
+      pointer-events: none;
+    }
+
+    .s26-btn-vol-down {
+      position: absolute;
+      right: -5px;
+      top: 176px;
+      width: 4px;
+      height: 44px;
+      border-radius: 0 4px 4px 0;
+      background: linear-gradient(180deg, #64748b, #334155);
+      pointer-events: none;
+    }
+
+    .s26-btn-power {
+      position: absolute;
+      right: -5px;
+      top: 238px;
+      width: 4px;
+      height: 64px;
+      border-radius: 0 4px 4px 0;
+      background: linear-gradient(180deg, #64748b, #334155);
+      pointer-events: none;
+    }
+
+    @keyframes pulseMic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.45); }
+      50% { box-shadow: 0 0 0 14px rgba(225, 29, 72, 0); }
+    }
+
+    .is-recording {
+      animation: pulseMic 1.5s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-900 flex items-center justify-center p-2 sm:p-5">
+
+  <!-- Chasis decorativo Samsung Galaxy S26 Ultra -->
+  <div class="relative w-full max-w-[412px] rounded-[42px] bg-slate-900 p-2.5 s26-shell">
+    <div class="s26-btn-vol-up" aria-hidden="true"></div>
+    <div class="s26-btn-vol-down" aria-hidden="true"></div>
+    <div class="s26-btn-power" aria-hidden="true"></div>
+
+    <!-- Pantalla del teléfono -->
+    <div class="relative bg-slate-50 rounded-[34px] overflow-hidden flex flex-col min-h-[760px] max-h-[880px]">
+
+      <!-- Barra de estado superior estilo One UI / S26 Ultra -->
+      <div class="bg-white px-5 pt-2.5 pb-1.5 flex items-center justify-between text-[11px] font-semibold text-slate-700 select-none border-b border-slate-100">
+        <span id="s26Clock" class="tabular-nums">00:00</span>
+        <span class="w-3 h-3 rounded-full bg-slate-900 ring-2 ring-slate-200 inline-block" aria-hidden="true"></span>
+        <div class="flex items-center gap-1.5 tabular-nums">
+          <span>5G</span>
+          <span class="inline-flex items-end gap-[1.5px] h-2.5" aria-hidden="true">
+            <span class="w-[2px] h-1 bg-slate-800 rounded-sm"></span>
+            <span class="w-[2px] h-1.5 bg-slate-800 rounded-sm"></span>
+            <span class="w-[2px] h-2 bg-slate-800 rounded-sm"></span>
+            <span class="w-[2px] h-2.5 bg-slate-800 rounded-sm"></span>
+          </span>
+          <span class="px-1 py-[0.5px] border border-slate-700 rounded-[3px] text-[9px]">100%</span>
+        </div>
+      </div>
+
+      <!-- Cabecera de la app y navegación principal -->
+      <header class="bg-white border-b border-slate-200 px-4 py-3 shrink-0">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+            <h1 class="text-base font-extrabold tracking-tight text-slate-900 truncate">FonoVibe</h1>
+          </div>
+          <span class="text-[11px] font-semibold text-slate-500">Bitácora</span>
+        </div>
+      </header>
+
+      <!-- Área desplazable principal -->
+      <main class="flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3">
+
+        <!-- Aviso único -->
+        <div id="toastBox" class="hidden rounded-xl px-3.5 py-2 text-xs font-semibold border transition"></div>
+
+        <!-- ======================================================= -->
+        <!-- VISTA 1: NOTAS Y GRABACIÓN POR VOZ (SIMPLIFICADA)        -->
+        <!-- ======================================================= -->
+        <section id="notesView" class="space-y-3">
+
+          <!-- Tarjeta única de captura -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span id="micLabel" class="text-xs font-bold text-slate-800">Un clic para hablar</span>
+              </div>
+              <span id="readyBadge" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Listo para guardar
+              </span>
+            </div>
+
+            <!-- Botón único de micrófono (1 clic activa, 1 clic desactiva) -->
+            <div class="flex flex-col items-center py-1">
+              <button
+                id="micBtn"
+                type="button"
+                onclick="toggleMic()"
+                aria-label="Activar o desactivar micrófono"
+                class="w-20 h-20 rounded-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white flex items-center justify-center shadow-md transition"
+              >
+                <svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+                  <path d="M5 10a7 7 0 0 0 14 0"></path>
+                  <line x1="12" y1="17" x2="12" y2="22"></line>
+                  <line x1="8" y1="22" x2="16" y2="22"></line>
+                </svg>
+              </button>
+              <p id="interimText" class="mt-2 min-h-[16px] text-xs font-medium text-indigo-700 text-center"></p>
+            </div>
+
+            <!-- Campo principal de texto / dictado -->
+            <div>
+              <textarea
+                id="noteInput"
+                rows="3"
+                oninput="handleManualTextInput()"
+                placeholder="Toca el micrófono para hablar o escribe aquí..."
+                class="w-full rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:outline-none px-3 py-2 text-sm text-slate-900"
+              ></textarea>
+            </div>
+
+            <!-- Transcripción final clara para revisar antes de guardar -->
+            <div class="rounded-xl bg-slate-50 border border-slate-200 p-2.5 space-y-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold text-slate-700">Transcripción final</span>
+                <span id="finalTranscriptSource" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                  Sin texto
+                </span>
+              </div>
+              <p id="finalTranscriptPreview" class="text-xs text-slate-500 italic whitespace-pre-line min-h-[18px]">
+                Aún no hay transcripción para revisar.
+              </p>
+            </div>
+
+            <!-- Botones de guardar según origen + limpiar -->
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                id="saveVoiceBtn"
+                type="button"
+                disabled
+                onclick="saveNoteBySource('voz')"
+                class="py-2.5 px-3 rounded-xl bg-slate-200 text-slate-400 cursor-not-allowed text-xs font-bold transition"
+              >
+                Guardar (Voz)
+              </button>
+              <button
+                id="saveTextBtn"
+                type="button"
+                disabled
+                onclick="saveNoteBySource('texto')"
+                class="py-2.5 px-3 rounded-xl bg-slate-200 text-slate-400 cursor-not-allowed text-xs font-bold transition"
+              >
+                Guardar (Texto)
+              </button>
+            </div>
+
+            <div class="flex justify-end">
+              <button
+                type="button"
+                onclick="clearNote()"
+                class="text-[11px] font-semibold text-slate-500 hover:text-slate-800 px-2 py-0.5 rounded-lg"
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista limpia de notas guardadas -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xs font-extrabold text-slate-900">Notas guardadas</h2>
+              <button
+                type="button"
+                onclick="clearAllNotes()"
+                class="text-[11px] font-semibold text-rose-600 hover:text-rose-700"
+              >
+                Borrar todo
+              </button>
+            </div>
+            <div id="notesList" class="space-y-2"></div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Barra de gestos inferior estilo Android -->
+      <div class="bg-white py-2 flex justify-center border-t border-slate-100 shrink-0">
+        <span class="w-28 h-1 rounded-full bg-slate-300" aria-hidden="true"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const NOTES_STORAGE_KEY = 'fonovibe_simple_notes_v1';
+    const ALLOWED_AREAS = ['Voz', 'Hábitos', 'Ánimo'];
+    const ALLOWED_TAGS = ['voz', 'habla', 'autonomia', 'comida', 'sueno', 'bano', 'rutina', 'calma', 'ansiedad', 'enojo', 'alegria', 'cansancio'];
+    const GEMINI_MODEL = 'gemini-3-flash-preview';
+    const GEMINI_API_KEY = '';
+
+    let notes = [];
+
+    // Estado del micrófono: 1 clic activa, 1 clic desactiva
+    let recognition = null;
+    let micActive = false;
+    let micBaseText = '';
+    let micFinalText = '';
+    let micInterimText = '';
+    let hasUsedVoiceForCurrentNote = false;
+    let hasTypedTextForCurrentNote = false;
+    let toastTimer = null;
+
+    // Respaldo de audio real para transcribir al detener el micrófono si SpeechRecognition no entrega texto
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let micStream = null;
+    let isTranscribingOnStop = false;
+
+    function updateReadyState() {
+      const noteInput = document.getElementById('noteInput');
+      const readyBadge = document.getElementById('readyBadge');
+      const saveVoiceBtn = document.getElementById('saveVoiceBtn');
+      const saveTextBtn = document.getElementById('saveTextBtn');
+      const previewEl = document.getElementById('finalTranscriptPreview');
+      const sourceBadge = document.getElementById('finalTranscriptSource');
+
+      const currentText = noteInput ? noteInput.value.trim() : '';
+      const hasText = currentText.length > 0;
+
+      if (!hasText) {
+        hasUsedVoiceForCurrentNote = false;
+        hasTypedTextForCurrentNote = false;
+      }
+
+      const canSaveVoice = !micActive && !isTranscribingOnStop && hasText && hasUsedVoiceForCurrentNote && !hasTypedTextForCurrentNote;
+      const canSaveText = !micActive && !isTranscribingOnStop && hasText && hasTypedTextForCurrentNote && !hasUsedVoiceForCurrentNote;
+      const readyToSave = canSaveVoice || canSaveText;
+
+      if (previewEl) {
+        if (hasText) {
+          previewEl.textContent = currentText;
+          previewEl.className = 'text-xs font-medium text-slate-800 not-italic whitespace-pre-line min-h-[18px]';
+        } else {
+          previewEl.textContent = 'Aún no hay transcripción para revisar.';
+          previewEl.className = 'text-xs text-slate-500 italic whitespace-pre-line min-h-[18px]';
+        }
+      }
+
+      if (sourceBadge) {
+        if (!hasText) {
+          sourceBadge.textContent = 'Sin texto';
+          sourceBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700';
+        } else if (hasUsedVoiceForCurrentNote) {
+          sourceBadge.textContent = 'Dictado por voz';
+          sourceBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800';
+        } else {
+          sourceBadge.textContent = 'Escrito a mano';
+          sourceBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+        }
+      }
+
+      if (readyBadge) {
+        readyBadge.classList.toggle('hidden', !readyToSave);
+      }
+
+      if (saveVoiceBtn) {
+        saveVoiceBtn.disabled = !canSaveVoice;
+        saveVoiceBtn.className = canSaveVoice
+          ? 'py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white text-xs font-bold shadow-sm transition'
+          : 'py-2.5 px-3 rounded-xl bg-slate-200 text-slate-400 cursor-not-allowed text-xs font-bold transition';
+      }
+
+      if (saveTextBtn) {
+        saveTextBtn.disabled = !canSaveText;
+        saveTextBtn.className = canSaveText
+          ? 'py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 active:scale-[0.99] text-white text-xs font-bold shadow-sm transition'
+          : 'py-2.5 px-3 rounded-xl bg-slate-200 text-slate-400 cursor-not-allowed text-xs font-bold transition';
+      }
+    }
+
+    function updateMicVisuals() {
+      const btn = document.getElementById('micBtn');
+      const label = document.getElementById('micLabel');
+      const dot = document.getElementById('statusDot');
+      const interimEl = document.getElementById('interimText');
+
+      if (btn) {
+        if (micActive) {
+          btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+          btn.classList.add('bg-rose-600', 'hover:bg-rose-700', 'is-recording');
+        } else {
+          btn.classList.remove('bg-rose-600', 'hover:bg-rose-700', 'is-recording');
+          btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        }
+      }
+
+      if (label) {
+        if (isTranscribingOnStop) {
+          label.textContent = 'Generando transcripción final...';
+        } else {
+          label.textContent = micActive ? 'Escuchando · Toca de nuevo para parar' : 'Un clic para hablar';
+        }
+      }
+
+      if (dot) {
+        dot.className = micActive
+          ? 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping'
+          : (isTranscribingOnStop ? 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse' : 'w-2.5 h-2.5 rounded-full bg-emerald-500');
+      }
+
+      if (interimEl) {
+        if (isTranscribingOnStop) {
+          interimEl.textContent = 'Preparando transcripción final...';
+        } else if (micActive) {
+          interimEl.textContent = micInterimText ? 'Escuchando: "' + micInterimText + '"' : 'Hablando en vivo... (toca para detener)';
+        } else {
+          interimEl.textContent = '';
+        }
+      }
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = String(reader.result || '');
+          const commaIdx = result.indexOf(',');
+          resolve(commaIdx >= 0 ? result.slice(commaIdx + 1) : result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function transcribeRecordedAudioWithAI(audioBlob) {
+      if (!audioBlob || audioBlob.size < 200) return '';
+      try {
+        const base64Audio = await blobToBase64(audioBlob);
+        const mimeType = audioBlob.type || 'audio/webm';
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+        const payload = {
+          contents: [{
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data: base64Audio } },
+              { text: 'Transcribe exactamente lo que se dice en español en una o dos frases claras. Devuelve solo la transcripción sin comillas.' }
+            ]
+          }]
+        };
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) return '';
+        const data = await res.json();
+        const text = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+        return text ? String(text).trim() : '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function stopMediaRecorderAndGetBlob() {
+      return new Promise((resolve) => {
+        const currentRecorder = mediaRecorder;
+        const chunks = audioChunks.slice();
+        mediaRecorder = null;
+        audioChunks = [];
+
+        const releaseStream = () => {
+          if (micStream) {
+            micStream.getTracks().forEach((t) => {
+              try { t.stop(); } catch (e) {}
+            });
+            micStream = null;
+          }
+        };
+
+        if (!currentRecorder || currentRecorder.state === 'inactive') {
+          releaseStream();
+          resolve(chunks.length ? new Blob(chunks, { type: (currentRecorder && currentRecorder.mimeType) || 'audio/webm' }) : null);
+          return;
+        }
+
+        currentRecorder.onstop = () => {
+          releaseStream();
+          const mime = currentRecorder.mimeType || 'audio/webm';
+          resolve(chunks.length ? new Blob(chunks, { type: mime }) : null);
+        };
+
+        try {
+          currentRecorder.stop();
+        } catch (e) {
+          releaseStream();
+          resolve(null);
+        }
+      });
+    }
+
+    async function startAudioBackupRecorder() {
+      audioChunks = [];
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+        return;
+      }
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (!micActive) {
+          micStream.getTracks().forEach((t) => t.stop());
+          micStream = null;
+          return;
+        }
+        const mr = new MediaRecorder(micStream);
+        mr.ondataavailable = (ev) => {
+          if (ev.data && ev.data.size > 0) {
+            audioChunks.push(ev.data);
+          }
+        };
+        mr.start(250);
+        mediaRecorder = mr;
+      } catch (e) {}
+    }
+
+    function createSpeechRecognizer() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return null;
+
+      const rec = new SR();
+      rec.lang = 'es-CL';
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.maxAlternatives = 1;
+
+      rec.onresult = (event) => {
+        if (!micActive) return;
+        let finalChunk = '';
+        let interimChunk = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0] && event.results[i][0].transcript ? event.results[i][0].transcript : '';
+          if (event.results[i].isFinal) {
+            finalChunk += t + ' ';
+          } else {
+            interimChunk += t + ' ';
+          }
+        }
+        if (finalChunk.trim()) {
+          micFinalText = (micFinalText + ' ' + finalChunk.trim()).trim();
+        }
+        micInterimText = interimChunk.trim();
+
+        const noteInput = document.getElementById('noteInput');
+        if (noteInput) {
+          noteInput.value = composeVoiceFullText();
+          hasUsedVoiceForCurrentNote = true;
+          hasTypedTextForCurrentNote = false;
+        }
+        updateReadyState();
+      };
+
+      // Se mantiene encendida hasta que el usuario haga clic de nuevo para detener
+      rec.onend = () => {
+        if (!micActive) return;
+        try {
+          rec.start();
+        } catch (e) {}
+      };
+
+      rec.onerror = () => {
+        // Mantiene el micrófono activo hasta que el usuario haga clic para detener
+      };
+
+      return rec;
+    }
+
+    async function stopMicOnly() {
+      if (!micActive && !isTranscribingOnStop) return;
+      micActive = false;
+      isTranscribingOnStop = true;
+
+      if (recognition) {
+        const current = recognition;
+        recognition = null;
+        try {
+          current.onresult = null;
+          current.onend = null;
+          current.onerror = null;
+          current.stop();
+        } catch (e) {}
+      }
+
+      // Consolidar lo capturado en vivo al detener
+      if (micInterimText.trim()) {
+        micFinalText = (micFinalText + ' ' + micInterimText.trim()).trim();
+        micInterimText = '';
+      }
+
+      updateMicVisuals();
+      updateReadyState();
+
+      const recordedBlob = await stopMediaRecorderAndGetBlob();
+      const noteInput = document.getElementById('noteInput');
+      let finalText = composeVoiceFullText();
+
+      if (!finalText && recordedBlob) {
+        const aiTranscript = await transcribeRecordedAudioWithAI(recordedBlob);
+        if (aiTranscript) {
+          micFinalText = aiTranscript;
+          finalText = composeVoiceFullText();
+        }
+      }
+
+      if (noteInput && finalText) {
+        noteInput.value = finalText;
+        hasUsedVoiceForCurrentNote = true;
+        hasTypedTextForCurrentNote = false;
+      }
+
+      isTranscribingOnStop = false;
+      updateMicVisuals();
+      updateReadyState();
+
+      if (finalText) {
+        showToast('Transcripción final lista para revisar y guardar.');
+      } else if (recordedBlob && recordedBlob.size > 200) {
+        showToast('No se pudo transcribir el audio; escribe tu nota o prueba de nuevo.', 'error');
+      } else {
+        showToast('No se detectó voz; puedes escribir tu nota abajo.', 'error');
+      }
+    }
+
+    function startMicOnly() {
+      const noteInput = document.getElementById('noteInput');
+      micBaseText = noteInput ? noteInput.value.trim() : '';
+      micFinalText = '';
+      micInterimText = '';
+      micActive = true;
+      isTranscribingOnStop = false;
+      hasUsedVoiceForCurrentNote = true;
+      hasTypedTextForCurrentNote = false;
+      updateMicVisuals();
+      updateReadyState();
+
+      startAudioBackupRecorder();
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        try {
+          recognition = createSpeechRecognizer();
+          recognition.start();
+        } catch (e) {}
+      }
+    }
+
+    function toggleMic() {
+      if (micActive) {
+        stopMicOnly();
+      } else if (!isTranscribingOnStop) {
+        startMicOnly();
+      }
+    }
+
+    function composeVoiceFullText() {
+      return [micBaseText, micFinalText, micInterimText]
+        .map((part) => (part || '').trim())
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+    }
+
+    function handleManualTextInput() {
+      const noteInput = document.getElementById('noteInput');
+      const val = noteInput ? noteInput.value.trim() : '';
+      if (!val) {
+        hasTypedTextForCurrentNote = false;
+        hasUsedVoiceForCurrentNote = false;
+      } else if (!hasUsedVoiceForCurrentNote) {
+        hasTypedTextForCurrentNote = true;
+      }
+      updateReadyState();
+    }
+
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(msg, type = 'info') {
+      const box = document.getElementById('toastBox');
+      if (!box) return;
+      box.textContent = msg;
+      box.className = type === 'error'
+        ? 'rounded-xl px-3.5 py-2 text-xs font-semibold border bg-rose-50 text-rose-800 border-rose-200'
+        : 'rounded-xl px-3.5 py-2 text-xs font-semibold border bg-emerald-50 text-emerald-800 border-emerald-200';
+      box.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 3200);
+    }
+
+    function loadNotes() {
+      try {
+        const raw = localStorage.getItem(NOTES_STORAGE_KEY);
+        notes = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(notes)) notes = [];
+      } catch (e) {
+        notes = [];
+      }
+    }
+
+    function saveNotesStorage() {
+      try {
+        localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+      } catch (e) {}
+    }
+
+    function inferAreaAndTags(text, selectedArea) {
+      const lower = String(text || '').toLowerCase();
+      let area = ALLOWED_AREAS.includes(selectedArea) ? selectedArea : 'Voz';
+      if (selectedArea === 'Auto') {
+        if (/(com[ií]|almuerz|desayun|cen[aá]|agua|comer|hambre|sueñ|dorm[ií]|bañ)/.test(lower)) {
+          area = 'Hábitos';
+        } else if (/(trist|content|aleg|calma|tranquil|ansios|nervios|enoj|cansad|bien|mal)/.test(lower)) {
+          area = 'Ánimo';
+        } else {
+          area = 'Voz';
+        }
+      }
+      const tagsInputEl = document.getElementById('tagsInput');
+      const rawTags = tagsInputEl ? tagsInputEl.value : '';
+      const parsed = rawTags
+        .split(/[,\s#]+/)
+        .map((t) => t.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))
+        .filter((t) => ALLOWED_TAGS.includes(t));
+      if (!parsed.length) {
+        if (/(com[ií]|almuerz|desayun|cen[aá]|comer)/.test(lower)) parsed.push('comida');
+        if (/(sueñ|dorm[ií])/.test(lower)) parsed.push('sueno');
+        if (/(bañ)/.test(lower)) parsed.push('bano');
+        if (/(calma|tranquil)/.test(lower)) parsed.push('calma');
+        if (/(ansios|nervios)/.test(lower)) parsed.push('ansiedad');
+        if (/(enoj)/.test(lower)) parsed.push('enojo');
+        if (/(content|aleg|bien)/.test(lower)) parsed.push('alegria');
+        if (/(cansad)/.test(lower)) parsed.push('cansancio');
+        if (!parsed.length) parsed.push(area === 'Hábitos' ? 'rutina' : (area === 'Ánimo' ? 'calma' : 'voz'));
+      }
+      return { area, tags: Array.from(new Set(parsed)).slice(0, 3) };
+    }
+
+    function buildSummary(text, customSummary) {
+      const manual = (customSummary || '').trim();
+      if (manual) return manual;
+      const clean = String(text || '').trim().replace(/\s+/g, ' ');
+      if (!clean) return 'Nota breve';
+      return clean.length > 72 ? clean.slice(0, 69).trim() + '...' : clean;
+    }
+
+    function saveNoteBySource(sourceMode) {
+      if (micActive || isTranscribingOnStop) {
+        showToast('Detén primero el micrófono para guardar.', 'error');
+        return;
+      }
+      const noteInput = document.getElementById('noteInput');
+      const text = noteInput ? noteInput.value.trim() : '';
+
+      if (!text) {
+        showToast('Escribe o dicta algo antes de guardar.', 'error');
+        return;
+      }
+      if (sourceMode === 'voz' && (!hasUsedVoiceForCurrentNote || hasTypedTextForCurrentNote)) {
+        showToast('Usa "Guardar (Texto)" cuando escribiste manualmente.', 'error');
+        return;
+      }
+      if (sourceMode === 'texto' && (!hasTypedTextForCurrentNote || hasUsedVoiceForCurrentNote)) {
+        showToast('Usa "Guardar (Voz)" cuando dictaste con el micrófono.', 'error');
+        return;
+      }
+
+      const meta = inferAreaAndTags(text, 'Auto');
+      const summary = buildSummary(text, '');
+      const now = new Date();
+
+      notes.unshift({
+        id: String(Date.now()),
+        text,
+        summary,
+        area: meta.area,
+        tags: meta.tags,
+        source: sourceMode === 'voz' ? 'voz' : 'texto',
+        createdAt: now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+      });
+
+      saveNotesStorage();
+      clearNote(true);
+      renderNotes();
+      showToast(sourceMode === 'voz' ? 'Nota guardada desde voz.' : 'Nota guardada desde texto.');
+    }
+
+    function clearNote(silent = false) {
+      if (micActive) {
+        micActive = false;
+        if (recognition) {
+          try { recognition.stop(); } catch (e) {}
+          recognition = null;
+        }
+        stopMediaRecorderAndGetBlob();
+      }
+      micBaseText = '';
+      micFinalText = '';
+      micInterimText = '';
+      hasUsedVoiceForCurrentNote = false;
+      hasTypedTextForCurrentNote = false;
+
+      const noteInput = document.getElementById('noteInput');
+      if (noteInput) noteInput.value = '';
+
+      updateMicVisuals();
+      updateReadyState();
+      if (!silent) showToast('Listo.');
+    }
+
+    function deleteNote(id) {
+      notes = notes.filter((n) => n.id !== id);
+      saveNotesStorage();
+      renderNotes();
+      showToast('Nota eliminada.');
+    }
+
+    function clearAllNotes() {
+      notes = [];
+      saveNotesStorage();
+      renderNotes();
+      showToast('Todas las notas fueron borradas.');
+    }
+
+    function renderNotes() {
+      const listEl = document.getElementById('notesList');
+      if (!listEl) return;
+      if (!notes.length) {
+        listEl.innerHTML = '<p class="text-xs text-slate-400 italic py-2">Aún no hay notas guardadas.</p>';
+        return;
+      }
+
+      listEl.innerHTML = notes.map((n) => {
+        const srcBadge = n.source === 'voz'
+          ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">Voz</span>'
+          : '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Texto</span>';
+
+        return `
+          <article class="rounded-xl border border-slate-200 bg-slate-50/70 p-2.5 space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center flex-wrap gap-1">
+                ${srcBadge}
+              </div>
+              <span class="text-[10px] text-slate-400 tabular-nums">${esc(n.createdAt)}</span>
+            </div>
+            <p class="text-xs font-semibold text-slate-900 whitespace-pre-line">${esc(n.text)}</p>
+            <div class="flex items-center justify-end gap-3 pt-0.5">
+              <button type="button" onclick="deleteNote('${esc(n.id)}')" class="text-[11px] font-semibold text-rose-600 hover:underline">
+                Borrar
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function initS26VisualClock() {
+      const clockEl = document.getElementById('s26Clock');
+      const tick = () => {
+        if (!clockEl) return;
+        const now = new Date();
+        clockEl.textContent = now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+      };
+      tick();
+      setInterval(tick, 15000);
+    }
+
+    (function initApp() {
+      initS26VisualClock();
+      loadNotes();
+      updateMicVisuals();
+      updateReadyState();
+      renderNotes();
+    })();
+  </script>
+</body>
+</html>
